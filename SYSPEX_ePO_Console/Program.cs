@@ -238,13 +238,13 @@ namespace SYSPEX_ePO_Console
                     mm.Body = "<p>Dear Valued Supplier,</p> <p>Attached please find our PO number " + DocNum + ", if you have any questions please call us immediately.</p>" +
                         "<p> Regards,</p>" +
           "<p> Procurement Team</p> ";
-                  
+
 
                 }
                 else
                 {
                     mm.Body = ST_HTMLBULIDER(DocNum);
-                  //  mm.To.Add("vigna@syspex.com");
+                    //  mm.To.Add("vigna@syspex.com");
                 }
 
 
@@ -369,11 +369,11 @@ namespace SYSPEX_ePO_Console
             sb.AppendLine("<li>To confirm the quantity and the delivery date within the next 24 hours <strong>(reply to all by using this e-mail</strong>)</li>");
             sb.AppendLine("<li>To indicate Syspex PO number for both Invoice and DO</li>");
             sb.AppendLine("<li>To take note our receiving hours (Monday to Fridays 8:00am &ndash; 12:00 &amp; 1:00pm &ndash; 4:00pm) <strong>- Only applicable to supplier(s) deliver at Syspex Warehouse</strong></li>");
+            sb.AppendLine("<li style=\"color : red;\"><strong>Note: We will be having yearly stock take on 28th November 2020, please note that no receiving on 27th November 2020 after 12pm</strong></li>");
             sb.AppendLine("</ol>");
             sb.AppendLine("<p>Thank you for your co-operation.</p>");
             sb.AppendLine("<p>Best Regards,</p>");
             sb.AppendLine("<p>Syspex Procurement Team</p>");
-
             return sb.ToString();
         }
     }
