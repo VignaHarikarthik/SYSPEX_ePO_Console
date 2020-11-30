@@ -318,7 +318,7 @@ namespace SYSPEX_ePO_Console
 
             if (CompanyCode == "65ST")
                 SQLConnection = SGConnection;
-            SQLQuery = "select  Distinct top 5  T0.DocNum,CONVERT(VARCHAR(10), T0.docdate, 103) as docdate, T3.DocEntry,T0.CardCode, T0.CardName , T1.E_Mail, (CASE WHEN (select max( Country)  from CRD1 where  CardCode = (select CardCode from OPOR where DocNum = T0.DocNum)   and AdresType ='B') != 'SG' THEN 'alicia.ang@syspex.com,angela.yap@syspex.com' ELSE ''END) + ',' + T2.email + ',' + ISNULL((SELECT Email from OHEM where CAST(empid as nvarchar) = CAST(T4.Requester as nvarchar)),'') +',' + ISNULL((SELECT Email from OHEM where empid = T4.OwnerCode ),'') + ',' + '65stproc@syspex.com,wansing.teo@syspex.com' as [cc]  from OPOR T0 INNER JOIN OCRD T1 on T0.CardCode = T1.CardCode INNER JOIN OHEM T2 on T2.empID = T0.OwnerCode INNER JOIN POR1 T3 on T3.DocEntry = T0.DocEntry INNER JOIN OPRQ T4 on T4.DocEntry = T3.BaseEntry INNER JOIN OITM T5 on T5.ItemCode = T3.ItemCode  where  T0.DocNum not in (select DocNum from[AndriodAppDB].[dbo].[syspex_ePO] where Company = '" + CompanyCode + "') and  CAST(T0.U_ePO AS nvarchar(max)) ='Yes' and T0.DocDate >='20200728' and  T0.DocDate <= getdate() and T0.DocStatus = 'O'";
+            SQLQuery = "select  Distinct top 5  T0.DocNum,CONVERT(VARCHAR(10), T0.docdate, 103) as docdate, T3.DocEntry,T0.CardCode, T0.CardName , T1.E_Mail, (CASE WHEN (select max( Country)  from CRD1 where  CardCode = (select CardCode from OPOR where DocNum = T0.DocNum)   and AdresType ='B') != 'SG' THEN 'alicia.ang@syspex.com,angela.yap@syspex.com' ELSE ''END) + ',' + T2.email + ',' + ISNULL((SELECT Email from OHEM where CAST(empid as nvarchar) = CAST(T4.Requester as nvarchar)),'') +',' + ISNULL((SELECT Email from OHEM where empid = T4.OwnerCode ),'') + ',' + '65stproc@syspex.com,charlston.tong@syspex.com,wansing.teo@syspex.com' as [cc]  from OPOR T0 INNER JOIN OCRD T1 on T0.CardCode = T1.CardCode INNER JOIN OHEM T2 on T2.empID = T0.OwnerCode INNER JOIN POR1 T3 on T3.DocEntry = T0.DocEntry INNER JOIN OPRQ T4 on T4.DocEntry = T3.BaseEntry INNER JOIN OITM T5 on T5.ItemCode = T3.ItemCode  where  T0.DocNum not in (select DocNum from[AndriodAppDB].[dbo].[syspex_ePO] where Company = '" + CompanyCode + "') and  CAST(T0.U_ePO AS nvarchar(max)) ='Yes' and T0.DocDate >='20200728' and  T0.DocDate <= getdate() and T0.DocStatus = 'O'";
 
             if (CompanyCode == "03SM")
             {
@@ -368,9 +368,9 @@ namespace SYSPEX_ePO_Console
             sb.AppendLine("<ol>");
             sb.AppendLine("<li>To confirm the quantity and the delivery date within the next 24 hours <strong>(reply to all by using this e-mail</strong>)</li>");
             sb.AppendLine("<li>To indicate Syspex PO number for both Invoice and DO</li>");
-            sb.AppendLine("<li>To take note our receiving hours (Monday to Fridays 8:00am &ndash; 12:00 &amp; 1:00pm &ndash; 4:00pm) <strong>- Only applicable to supplier(s) deliver at Syspex Warehouse</strong></li>");
-            sb.AppendLine("<li style=\"color : red;\"><strong>Note: We will be having yearly stock take on 28th November 2020, please note that no receiving on 27th November 2020 after 12pm</strong></li>");
-            sb.AppendLine("<li style=\"color : yellow;\"><strong>***Do not reply to noreply@syspex.com as this is a unmanned mail box ***</strong></li>");
+            sb.AppendLine("<li> To take note our receiving hours (Monday to Fridays 8:00am &ndash; 12:00 &amp; 1:00pm &ndash; 4:00pm) <strong>- Only applicable to supplier(s) deliver at Syspex Warehouse</strong></li>");
+            sb.AppendLine("<li> Please take note and comply that total height of incoming palletised goods should not exceed 1.5m. </ li>");
+            sb.AppendLine("<li>***Do not reply to <u>noreply@syspex.com</u> as this is a unmanned mail box ***</li>");
             sb.AppendLine("</ol>");
             sb.AppendLine("<p>Thank you for your co-operation.</p>");
             sb.AppendLine("<p>Best Regards,</p>");
