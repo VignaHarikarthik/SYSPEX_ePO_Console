@@ -372,7 +372,7 @@ namespace SYSPEX_ePO_Console
             sb.AppendLine("<li> Please take note and comply that total height of incoming palletised goods should not exceed 1.5m. </ li>");
             sb.AppendLine("<li>***Do not reply to <u>noreply@syspex.com</u> as this is a unmanned mail box ***</li>");
             sb.AppendLine("</ol>");
-            sb.AppendLine("<p><strong>Please take note: We will be closed from 11 Feb to 15 Feb 2021 for CNY, our last receiving will be on 9 Feb 2021 (8:00am – 12:00 & 1:00pm – 4:00pm)</strong></p>");
+            sb.AppendLine("<p style=\"color:black; background:yellow\">Please take note: We will be closed from 11 Feb to 15 Feb 2021 for CNY, our last receiving will be on 9 Feb 2021 (8:00am – 12:00 & 1:00pm – 4:00pm)</p>");
             sb.AppendLine("<p>Thank you for your co-operation.</p>");
             sb.AppendLine("<p>Best Regards,</p>");
             sb.AppendLine("<p>Syspex Procurement Team</p>");
