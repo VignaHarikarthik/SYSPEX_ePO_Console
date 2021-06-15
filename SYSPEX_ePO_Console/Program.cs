@@ -259,16 +259,26 @@ namespace SYSPEX_ePO_Console
                     Host = "smtp.gmail.com",
                     EnableSsl = true
                 };
-                System.Net.NetworkCredential NetworkCred = new System.Net.NetworkCredential
+                if (CompanyCode == "65ST")
                 {
-                    UserName = "noreply@syspex.com",
-                    Password = "design35"
-                };
-                smtp.UseDefaultCredentials = true;
-                smtp.Credentials = NetworkCred;
-                smtp.Port = 587;
-                mm.Attachments.Add(new System.Net.Mail.Attachment(CrDiskFileDestinationOptions.DiskFileName));
-                smtp.Send(mm);
+                    System.Net.NetworkCredential NetworkCred = new System.Net.NetworkCredential("sg.procurement@syspex.com", "enhance5");
+                    smtp.UseDefaultCredentials = true;
+                    smtp.Credentials = NetworkCred;
+                    smtp.Port = 587;
+                    mm.Attachments.Add(new System.Net.Mail.Attachment(CrDiskFileDestinationOptions.DiskFileName));
+                    smtp.Send(mm);
+                }
+                else
+                {
+                    System.Net.NetworkCredential NetworkCred = new System.Net.NetworkCredential("noreply@syspex.com", "design35");
+                    smtp.UseDefaultCredentials = true;
+                    smtp.Credentials = NetworkCred;
+                    smtp.Port = 587;
+                    mm.Attachments.Add(new System.Net.Mail.Attachment(CrDiskFileDestinationOptions.DiskFileName));
+                    smtp.Send(mm);
+                }
+              
+              
                 success = true;
 
 
@@ -323,7 +333,7 @@ namespace SYSPEX_ePO_Console
                 sb.AppendLine("select  Distinct top 5  T0.DocNum,CONVERT(VARCHAR(10), T0.docdate, 103) as docdate, T3.DocEntry,T0.CardCode, T0.CardName , T1.E_Mail, ");
                 sb.AppendLine("(CASE WHEN (select max( Country)  from CRD1 where ");
                 sb.AppendLine("CardCode = (select CardCode from OPOR where DocNum = T0.DocNum)   and AdresType ='B') != 'SG' ");
-                sb.AppendLine("THEN 'alicia.ang@syspex.com,angela.yap@syspex.com' ELSE ''END) + ',' + T2.email + ',' +  ");
+                sb.AppendLine("THEN 'alicia.ang@syspex.com,angela.yap@syspex.com,angie.koo@syspex.com' ELSE ''END) + ',' + T2.email + ',' +  ");
                 sb.AppendLine("--- PR Requester if got multiple PR in one PO");
                 sb.AppendLine("ISNULL((SELECT STUFF ((SELECT ',' + Email from OHEM where CAST(empid as nvarchar) in ");
                 sb.AppendLine("(select Requester from OPRQ TX inner Join PRQ1 TY on Tx.DocEntry = Ty.DocEntry where Ty.TrgetEntry = T0.DocEntry ) FOR XML PATH('') ), 1, 1, '')),'') +");
@@ -331,10 +341,10 @@ namespace SYSPEX_ePO_Console
                 sb.AppendLine("--PR Owner Code if got multiple PR in one PO");
                 sb.AppendLine("ISNULL((SELECT STUFF ((SELECT ',' + Email from OHEM where CAST(empid as nvarchar) in ");
                 sb.AppendLine("(select TX.OwnerCode from OPRQ TX inner Join PRQ1 TY on Tx.DocEntry = Ty.DocEntry where Ty.TrgetEntry = T0.DocEntry ) FOR XML PATH('') ), 1, 1, '')),'') +");
-                sb.AppendLine("',' + '65stproc@syspex.com,charlston.tong@syspex.com,wansing.teo@syspex.com' as [cc]");
+                sb.AppendLine("',' + 'SG.Procurement@syspex.com' as [cc]");
                 sb.AppendLine("from OPOR T0 INNER JOIN OCRD T1 on T0.CardCode = T1.CardCode INNER JOIN OHEM T2 on T2.empID = T0.OwnerCode");
                 sb.AppendLine("INNER JOIN POR1 T3 on T3.DocEntry = T0.DocEntry  where  T0.DocNum  ");
-                sb.AppendLine("not in (select DocNum from[AndriodAppDB].[dbo].[syspex_ePO] where Company = '" + CompanyCode + "') and  CAST(T0.U_ePO AS nvarchar(max)) ='Yes' and T0.DocDate >='20200728' and  T0.DocDate <= getdate() and T0.DocStatus = 'O'");
+                sb.AppendLine("not in (select DocNum from[AndriodAppDB].[dbo].[syspex_ePO] where Company = '" + CompanyCode + "') and  CAST(T0.U_ePO AS nvarchar(max)) ='Yes' and T0.DocDate <= getdate() and T0.DocStatus = 'O'");
                 SQLQuery = sb.ToString();
             }
 
@@ -382,14 +392,13 @@ namespace SYSPEX_ePO_Console
 
             sb.AppendLine("<p>Dear Supplier,</p>");
             sb.AppendLine("<p>Please find <strong><u>PO# " + DocNum + "</u></strong> and file attachments.</p>");
-            sb.AppendLine("<p>We would need you:</p>");
+            sb.AppendLine("<p>Reply back this email to confirm on the order quantity and the delivery date stated on the PO within the next 24 hours</p>");
+            sb.AppendLine("<p>Kindly take note and comply with the following packaging and delivery information, </p>");
             sb.AppendLine("<ol>");
-            sb.AppendLine("<li>To confirm the quantity and the delivery date within the next 24 hours <strong>(reply to all by using this e-mail</strong>)</li>");
             sb.AppendLine("<li>To indicate Syspex PO number for both Invoice and DO</li>");
             sb.AppendLine("<li> To take note our receiving hours (Monday to Fridays 10:00am &ndash; 12:00 &amp; 1:00pm &ndash; 4:00pm) <strong>- Only applicable to supplier(s) deliver at Syspex Warehouse</strong></li>");
             sb.AppendLine("<li> Please take note and comply that total height of incoming palletised goods should not exceed 1.5m. </ li>");
             sb.AppendLine("<li> The pallet must be able to truck by hand pallet truck </li>");
-            sb.AppendLine("<li>***Do not reply to <u>noreply@syspex.com</u> as this is a unmanned mail box ***</li>");
             sb.AppendLine("</ol>");
             sb.AppendLine("<p>Thank you for your co-operation.</p>");
             sb.AppendLine("<p>Best Regards,</p>");
