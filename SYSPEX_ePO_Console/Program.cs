@@ -35,8 +35,114 @@ namespace SYSPEX_ePO_Console
             EPO("03SM"); // Go Live on 17/06/20
             System.Threading.Thread.Sleep(5000);
             EPO("07ST"); //Go Live on 22/06/20
+            System.Threading.Thread.Sleep(5000);
+            //Go Live 10/08/2021
+            EQUOTE("65ST");
 
 
+        }
+
+        private static void EQUOTE(string company_code)
+        {
+            DataTable dt = geteQuote("65ST").Tables[0];
+            string crystal_path = "F:\\Crystal Reports\\SYSPEX_QUOTATION_65ST.rpt";
+            if (dt.Rows.Count > 0)
+            {
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    string pdf_path = "F:\\eQuote\\" + company_code + "\\" + dt.Rows[i]["docnum"].ToString() + ".pdf";
+                    export_pdf(pdf_path, "SYSPEX_LIVE", crystal_path, dt.Rows[i]["docentry"].ToString());
+                }
+            }
+        }
+        private static DataSet geteQuote(string CompanyCode)
+        {
+            SqlConnection SQLConnection = new SqlConnection();
+
+            if (CompanyCode == "65ST")
+            {
+                SQLConnection = SGConnection;
+                StringBuilder sb = new StringBuilder();
+                sb.AppendLine("select Docnum,DocDate,T0.DocEntry, U_Email[Email], U_BillAttn, CardName, DateDiff(DAY,DocDate,getdate())[Diff]  from OQUT T0 INNER JOIN OSLP T1 on T0.SlpCode = T1.SlpCode  where Memo ='Technical' and DocStatus = 'O' and (DateDiff(DAY,DocDate,getdate()) % 14) = 0 and docdate>='20210801'");
+                sb.AppendLine("and FORMAT(docdate,'dd/MM/yyyy') != FORMAT(getdate(),'dd/MM/yyyy') and U_Email !=''  order by DocDate desc");
+                SQLQuery = sb.ToString();
+            }
+
+            DataSet dsetItem = new DataSet();
+            SqlCommand CmdItem = new SqlCommand(SQLQuery, SQLConnection)
+            {
+                CommandType = CommandType.Text
+            };
+            SqlDataAdapter AdptItm = new SqlDataAdapter(CmdItem);
+            AdptItm.Fill(dsetItem);
+            CmdItem.Dispose();
+            AdptItm.Dispose();
+            SQLConnection.Close();
+            return dsetItem;
+        }
+        public static bool export_pdf(string pdf_path, string db_name, string crystal_path, string docentry)
+        {
+            try
+            {
+
+                ReportDocument cryRpt = new ReportDocument();
+                cryRpt.Load(crystal_path);
+
+                new TableLogOnInfos();
+                TableLogOnInfo crtableLogoninfo;
+                var crConnectionInfo = new ConnectionInfo();
+
+                ParameterFieldDefinitions crParameterFieldDefinitions;
+                ParameterFieldDefinition crParameterFieldDefinition;
+                ParameterValues crParameterValues = new ParameterValues();
+                ParameterDiscreteValue crParameterDiscreteValue = new ParameterDiscreteValue();
+
+                crParameterDiscreteValue.Value = Convert.ToString(docentry);
+                crParameterFieldDefinitions = cryRpt.DataDefinition.ParameterFields;
+                crParameterFieldDefinition = crParameterFieldDefinitions["@DOCENTRY"];
+                crParameterValues = crParameterFieldDefinition.CurrentValues;
+
+                crParameterValues.Clear();
+                crParameterValues.Add(crParameterDiscreteValue);
+                crParameterFieldDefinition.ApplyCurrentValues(crParameterValues);
+
+                crConnectionInfo.ServerName = "SYSPEXSAP04";
+                crConnectionInfo.DatabaseName = db_name;
+                crConnectionInfo.UserID = "sa";
+                crConnectionInfo.Password = "Password1111";
+
+                var crTables = cryRpt.Database.Tables;
+                foreach (Table crTable in crTables)
+                {
+                    crtableLogoninfo = crTable.LogOnInfo;
+                    crtableLogoninfo.ConnectionInfo = crConnectionInfo;
+                    crTable.ApplyLogOnInfo(crtableLogoninfo);
+                }
+
+
+
+                ExportOptions CrExportOptions;
+                DiskFileDestinationOptions CrDiskFileDestinationOptions = new DiskFileDestinationOptions();
+                PdfRtfWordFormatOptions CrFormatTypeOptions = new PdfRtfWordFormatOptions();
+
+                CrDiskFileDestinationOptions.DiskFileName = pdf_path;
+                CrExportOptions = cryRpt.ExportOptions;
+                {
+                    CrExportOptions.ExportDestinationType = ExportDestinationType.DiskFile;
+                    CrExportOptions.ExportFormatType = ExportFormatType.PortableDocFormat;
+                    CrExportOptions.DestinationOptions = CrDiskFileDestinationOptions;
+                    CrExportOptions.FormatOptions = CrFormatTypeOptions;
+                }
+                cryRpt.Export();
+                return true;
+
+
+            }
+            catch (CrystalReportsException ex)
+            {
+
+                throw ex;
+            }
         }
 
         private static void EPO(string CompanyCode)
@@ -277,8 +383,8 @@ namespace SYSPEX_ePO_Console
                     mm.Attachments.Add(new System.Net.Mail.Attachment(CrDiskFileDestinationOptions.DiskFileName));
                     smtp.Send(mm);
                 }
-              
-              
+
+
                 success = true;
 
 
@@ -352,14 +458,14 @@ namespace SYSPEX_ePO_Console
             {
                 //Go Live 20-06-17
                 SQLConnection = KLConnection;
-                SQLQuery = "select  Distinct top 5  T0.DocNum,CONVERT(VARCHAR(10), T0.docdate, 103) as docdate, T3.DocEntry,T0.CardCode, T0.CardName , T1.E_Mail,  T2.email + ',' + ISNULL((SELECT Email from OHEM where CAST(empid as nvarchar) = CAST(T4.Requester as nvarchar)),'') +',' + ISNULL((SELECT Email from OHEM where empid = T4.OwnerCode ),'') + ',' + CASE WHEN T5.ItmsGrpCod = '101' THEN 'venice.tan@syspex.com,rabby.cheng@syspex.com' ELSE '' END as [cc]  from OPOR T0 INNER JOIN OCRD T1 on T0.CardCode = T1.CardCode INNER JOIN OHEM T2 on T2.empID = T0.OwnerCode INNER JOIN POR1 T3 on T3.DocEntry = T0.DocEntry INNER JOIN OPRQ T4 on T4.DocEntry = T3.BaseEntry INNER JOIN OITM T5 on T5.ItemCode = T3.ItemCode where year(t0.DocDate) = year(getdate()) and month(t0.DocDate) = month(getdate()) and day(t0.DocDate) = day(getdate()) and T0.DocNum not in (select DocNum from[AndriodAppDB].[dbo].[syspex_ePO] where Company = '" + CompanyCode + "') and T0.DocDate >='20200617' and  T0.DocDate <= getdate() and T0.DocStatus = 'O'";
+                SQLQuery = "select  Distinct top 5  T0.DocNum,CONVERT(VARCHAR(10), T0.docdate, 103) as docdate, T3.DocEntry,T0.CardCode, T0.CardName , T1.E_Mail,  T2.email + ',' + ISNULL((SELECT Email from OHEM where CAST(empid as nvarchar) = CAST(T4.Requester as nvarchar)),'') +',' + ISNULL((SELECT Email from OHEM where empid = T4.OwnerCode ),'') + ',' + CASE WHEN T5.ItmsGrpCod = '101' THEN 'venice.tan@syspex.com,rabby.cheng@syspex.com' ELSE '' END as [cc]  from OPOR T0 INNER JOIN OCRD T1 on T0.CardCode = T1.CardCode INNER JOIN OHEM T2 on T2.empID = T0.OwnerCode INNER JOIN POR1 T3 on T3.DocEntry = T0.DocEntry INNER JOIN OPRQ T4 on T4.DocEntry = T3.BaseEntry INNER JOIN OITM T5 on T5.ItemCode = T3.ItemCode where year(t0.DocDate) = year(getdate()) and month(t0.DocDate) = month(getdate())  and T0.DocNum not in (select DocNum from[AndriodAppDB].[dbo].[syspex_ePO] where Company = '" + CompanyCode + "') and T0.DocDate >='20200617' and  T0.DocDate <= getdate() and T0.DocStatus = 'O'";
             }
 
             if (CompanyCode == "07ST")
             {
                 //Go Live 22-06-20
                 SQLConnection = JBConnection;
-                SQLQuery = "select  Distinct top 5  T0.DocNum,CONVERT(VARCHAR(10), T0.docdate, 103) as docdate, T3.DocEntry,T0.CardCode, T0.CardName , T1.E_Mail,  T2.email + ',' + ISNULL((SELECT Email from OHEM where CAST(empid as nvarchar) = CAST(T4.Requester as nvarchar)),'') +',' + ISNULL((SELECT Email from OHEM where empid = T4.OwnerCode ),'')   as [cc]  from OPOR T0 INNER JOIN OCRD T1 on T0.CardCode = T1.CardCode INNER JOIN OHEM T2 on T2.empID = T0.OwnerCode INNER JOIN POR1 T3 on T3.DocEntry = T0.DocEntry INNER JOIN OPRQ T4 on T4.DocEntry = T3.BaseEntry INNER JOIN OITM T5 on T5.ItemCode = T3.ItemCode where year(t0.DocDate) = year(getdate()) and month(t0.DocDate) = month(getdate()) and day(t0.DocDate) = day(getdate()) and T0.DocNum not in (select DocNum from[AndriodAppDB].[dbo].[syspex_ePO] where Company = '" + CompanyCode + "') and T0.DocDate >='20200622' and  T0.DocDate <= getdate()  and T0.DocStatus = 'O'";
+                SQLQuery = "select  Distinct top 5  T0.DocNum,CONVERT(VARCHAR(10), T0.docdate, 103) as docdate, T3.DocEntry,T0.CardCode, T0.CardName , T1.E_Mail,  T2.email + ',' + ISNULL((SELECT Email from OHEM where CAST(empid as nvarchar) = CAST(T4.Requester as nvarchar)),'') +',' + ISNULL((SELECT Email from OHEM where empid = T4.OwnerCode ),'')   as [cc]  from OPOR T0 INNER JOIN OCRD T1 on T0.CardCode = T1.CardCode INNER JOIN OHEM T2 on T2.empID = T0.OwnerCode INNER JOIN POR1 T3 on T3.DocEntry = T0.DocEntry INNER JOIN OPRQ T4 on T4.DocEntry = T3.BaseEntry INNER JOIN OITM T5 on T5.ItemCode = T3.ItemCode where year(t0.DocDate) = year(getdate()) and month(t0.DocDate) = month(getdate())  and T0.DocNum not in (select DocNum from[AndriodAppDB].[dbo].[syspex_ePO] where Company = '" + CompanyCode + "') and T0.DocDate >='20200622' and  T0.DocDate <= getdate()  and T0.DocStatus = 'O'";
             }
 
             if (CompanyCode == "21SK")
@@ -371,7 +477,7 @@ namespace SYSPEX_ePO_Console
             if (CompanyCode == "04SI")
             {
                 SQLConnection = PGConnection;
-                SQLQuery = "select  Distinct top 5  T0.DocNum,CONVERT(VARCHAR(10), T0.docdate, 103) as docdate, T3.DocEntry,T0.CardCode, T0.CardName , T1.E_Mail,  T2.email + ',' + ISNULL((SELECT Email from OHEM where CAST(empid as nvarchar) = CAST(T4.Requester as nvarchar)),'') +',' + ISNULL((SELECT Email from OHEM where empid = T4.OwnerCode ),'') +',' +'jane.khoo@syspex.com' + ',' + CASE WHEN T5.ItmsGrpCod = '101' THEN 'venice.tan@syspex.com,rabby.cheng@syspex.com' ELSE '' END as [cc]  from OPOR T0 INNER JOIN OCRD T1 on T0.CardCode = T1.CardCode INNER JOIN OHEM T2 on T2.empID = T0.OwnerCode INNER JOIN POR1 T3 on T3.DocEntry = T0.DocEntry INNER JOIN OPRQ T4 on T4.DocEntry = T3.BaseEntry INNER JOIN OITM T5 on T5.ItemCode = T3.ItemCode where year(t0.DocDate) = year(getdate()) and month(t0.DocDate) = month(getdate()) and day(t0.DocDate) = day(getdate()) and T0.DocNum not in (select DocNum from[AndriodAppDB].[dbo].[syspex_ePO] where Company = '" + CompanyCode + "') and T0.DocDate >='20200617' and T0.DocDate <= getdate() and T0.DocStatus = 'O'";
+                SQLQuery = "select  Distinct top 5  T0.DocNum,CONVERT(VARCHAR(10), T0.docdate, 103) as docdate, T3.DocEntry,T0.CardCode, T0.CardName , T1.E_Mail,  T2.email + ',' + ISNULL((SELECT Email from OHEM where CAST(empid as nvarchar) = CAST(T4.Requester as nvarchar)),'') +',' + ISNULL((SELECT Email from OHEM where empid = T4.OwnerCode ),'') +',' +'jane.khoo@syspex.com' + ',' + CASE WHEN T5.ItmsGrpCod = '101' THEN 'venice.tan@syspex.com,rabby.cheng@syspex.com' ELSE '' END as [cc]  from OPOR T0 INNER JOIN OCRD T1 on T0.CardCode = T1.CardCode INNER JOIN OHEM T2 on T2.empID = T0.OwnerCode INNER JOIN POR1 T3 on T3.DocEntry = T0.DocEntry INNER JOIN OPRQ T4 on T4.DocEntry = T3.BaseEntry INNER JOIN OITM T5 on T5.ItemCode = T3.ItemCode where year(t0.DocDate) = year(getdate()) and month(t0.DocDate) = month(getdate())  and T0.DocNum not in (select DocNum from[AndriodAppDB].[dbo].[syspex_ePO] where Company = '" + CompanyCode + "') and T0.DocDate >='20200617' and T0.DocDate <= getdate() and T0.DocStatus = 'O'";
             }
             DataSet dsetItem = new DataSet();
             SqlCommand CmdItem = new SqlCommand(SQLQuery, SQLConnection)
