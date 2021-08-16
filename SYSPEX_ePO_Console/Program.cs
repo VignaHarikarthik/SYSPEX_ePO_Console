@@ -28,6 +28,8 @@ namespace SYSPEX_ePO_Console
 
         static void Main(string[] args)
         {
+            //  Go Live 10 / 08 / 2021
+            EQUOTE("65ST");
             EPO("65ST"); // Go Live on 31/08/20
             System.Threading.Thread.Sleep(5000);
             EPO("04SI"); // Go Live on 17/06/20
@@ -36,7 +38,7 @@ namespace SYSPEX_ePO_Console
             System.Threading.Thread.Sleep(5000);
             EPO("07ST"); //Go Live on 22/06/20
             System.Threading.Thread.Sleep(5000);
-            //Go Live 10/08/2021
+          //  Go Live 10 / 08 / 2021
             EQUOTE("65ST");
 
 
