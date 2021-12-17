@@ -29,7 +29,7 @@ namespace SYSPEX_ePO_Console
         static void Main(string[] args)
         {
             //  Go Live 10 / 08 / 2021
-            EQUOTE("65ST");
+
             EPO("65ST"); // Go Live on 31/08/20
             System.Threading.Thread.Sleep(5000);
             EPO("04SI"); // Go Live on 17/06/20
@@ -38,50 +38,12 @@ namespace SYSPEX_ePO_Console
             System.Threading.Thread.Sleep(5000);
             EPO("07ST"); //Go Live on 22/06/20
             System.Threading.Thread.Sleep(5000);
-          //  Go Live 10 / 08 / 2021
-            EQUOTE("65ST");
+
 
 
         }
 
-        private static void EQUOTE(string company_code)
-        {
-            DataTable dt = geteQuote("65ST").Tables[0];
-            string crystal_path = "F:\\Crystal Reports\\SYSPEX_QUOTATION_65ST.rpt";
-            if (dt.Rows.Count > 0)
-            {
-                for (int i = 0; i < dt.Rows.Count; i++)
-                {
-                    string pdf_path = "F:\\eQuote\\" + company_code + "\\" + dt.Rows[i]["docnum"].ToString() + ".pdf";
-                    export_pdf(pdf_path, "SYSPEX_LIVE", crystal_path, dt.Rows[i]["docentry"].ToString());
-                }
-            }
-        }
-        private static DataSet geteQuote(string CompanyCode)
-        {
-            SqlConnection SQLConnection = new SqlConnection();
 
-            if (CompanyCode == "65ST")
-            {
-                SQLConnection = SGConnection;
-                StringBuilder sb = new StringBuilder();
-                sb.AppendLine("select Docnum,DocDate,T0.DocEntry, U_Email[Email], U_BillAttn, CardName, DateDiff(DAY,DocDate,getdate())[Diff]  from OQUT T0 INNER JOIN OSLP T1 on T0.SlpCode = T1.SlpCode  where Memo ='Technical' and DocStatus = 'O' and (DateDiff(DAY,DocDate,getdate()) % 14) = 0 and docdate>='20210801'");
-                sb.AppendLine("and FORMAT(docdate,'dd/MM/yyyy') != FORMAT(getdate(),'dd/MM/yyyy') and U_Email !=''  order by DocDate desc");
-                SQLQuery = sb.ToString();
-            }
-
-            DataSet dsetItem = new DataSet();
-            SqlCommand CmdItem = new SqlCommand(SQLQuery, SQLConnection)
-            {
-                CommandType = CommandType.Text
-            };
-            SqlDataAdapter AdptItm = new SqlDataAdapter(CmdItem);
-            AdptItm.Fill(dsetItem);
-            CmdItem.Dispose();
-            AdptItm.Dispose();
-            SQLConnection.Close();
-            return dsetItem;
-        }
         public static bool export_pdf(string pdf_path, string db_name, string crystal_path, string docentry)
         {
             try
@@ -378,7 +340,7 @@ namespace SYSPEX_ePO_Console
                 }
                 else
                 {
-                    System.Net.NetworkCredential NetworkCred = new System.Net.NetworkCredential("noreply@syspex.com", "design35");
+                    System.Net.NetworkCredential NetworkCred = new System.Net.NetworkCredential("noreply@syspex.com", "design360");
                     smtp.UseDefaultCredentials = true;
                     smtp.Credentials = NetworkCred;
                     smtp.Port = 587;
@@ -441,7 +403,7 @@ namespace SYSPEX_ePO_Console
                 sb.AppendLine("select  Distinct top 5  T0.DocNum,CONVERT(VARCHAR(10), T0.docdate, 103) as docdate, T3.DocEntry,T0.CardCode, T0.CardName , T1.E_Mail, ");
                 sb.AppendLine("(CASE WHEN (select max( Country)  from CRD1 where ");
                 sb.AppendLine("CardCode = (select CardCode from OPOR where DocNum = T0.DocNum)   and AdresType ='B') != 'SG' ");
-                sb.AppendLine("THEN 'alicia.ang@syspex.com,angela.yap@syspex.com,angie.koo@syspex.com' ELSE ''END) + ',' + T2.email + ',' +  ");
+                sb.AppendLine("THEN 'angela.yap@syspex.com,angie.koo@syspex.com' ELSE ''END) + ',' + T2.email + ',' +  ");
                 sb.AppendLine("--- PR Requester if got multiple PR in one PO");
                 sb.AppendLine("ISNULL((SELECT STUFF ((SELECT ',' + Email from OHEM where CAST(empid as nvarchar) in ");
                 sb.AppendLine("(select Requester from OPRQ TX inner Join PRQ1 TY on Tx.DocEntry = Ty.DocEntry where Ty.TrgetEntry = T0.DocEntry ) FOR XML PATH('') ), 1, 1, '')),'') +");
@@ -460,7 +422,7 @@ namespace SYSPEX_ePO_Console
             {
                 //Go Live 20-06-17
                 SQLConnection = KLConnection;
-                SQLQuery = "select  Distinct top 5  T0.DocNum,CONVERT(VARCHAR(10), T0.docdate, 103) as docdate, T3.DocEntry,T0.CardCode, T0.CardName , T1.E_Mail,  T2.email + ',' + ISNULL((SELECT Email from OHEM where CAST(empid as nvarchar) = CAST(T4.Requester as nvarchar)),'') +',' + ISNULL((SELECT Email from OHEM where empid = T4.OwnerCode ),'') + ',' + CASE WHEN T5.ItmsGrpCod = '101' THEN 'venice.tan@syspex.com,rabby.cheng@syspex.com' ELSE '' END as [cc]  from OPOR T0 INNER JOIN OCRD T1 on T0.CardCode = T1.CardCode INNER JOIN OHEM T2 on T2.empID = T0.OwnerCode INNER JOIN POR1 T3 on T3.DocEntry = T0.DocEntry INNER JOIN OPRQ T4 on T4.DocEntry = T3.BaseEntry INNER JOIN OITM T5 on T5.ItemCode = T3.ItemCode where year(t0.DocDate) = year(getdate()) and month(t0.DocDate) = month(getdate())  and T0.DocNum not in (select DocNum from[AndriodAppDB].[dbo].[syspex_ePO] where Company = '" + CompanyCode + "') and T0.DocDate >='20200617' and  T0.DocDate <= getdate() and T0.DocStatus = 'O'";
+                SQLQuery = "select  Distinct top 5  T0.DocNum,CONVERT(VARCHAR(10), T0.docdate, 103) as docdate, T3.DocEntry,T0.CardCode, T0.CardName , T1.E_Mail,  T2.email + ',' + ISNULL((SELECT Email from OHEM where CAST(empid as nvarchar) = CAST(T4.Requester as nvarchar)),'') +',' + ISNULL((SELECT Email from OHEM where empid = T4.OwnerCode ),'') + ',alice.foh@syspex.com,jane.khoo@syspex.com' +',' + CASE WHEN T5.ItmsGrpCod = '101' THEN 'venice.tan@syspex.com,rabby.cheng@syspex.com' ELSE '' END as [cc]  from OPOR T0 INNER JOIN OCRD T1 on T0.CardCode = T1.CardCode INNER JOIN OHEM T2 on T2.empID = T0.OwnerCode INNER JOIN POR1 T3 on T3.DocEntry = T0.DocEntry INNER JOIN OPRQ T4 on T4.DocEntry = T3.BaseEntry INNER JOIN OITM T5 on T5.ItemCode = T3.ItemCode where year(t0.DocDate) = year(getdate()) and month(t0.DocDate) = month(getdate())  and T0.DocNum not in (select DocNum from[AndriodAppDB].[dbo].[syspex_ePO] where Company = '" + CompanyCode + "') and T0.DocDate >='20200617' and  T0.DocDate <= getdate() and T0.DocStatus = 'O'";
             }
 
             if (CompanyCode == "07ST")
@@ -479,7 +441,7 @@ namespace SYSPEX_ePO_Console
             if (CompanyCode == "04SI")
             {
                 SQLConnection = PGConnection;
-                SQLQuery = "select  Distinct top 5  T0.DocNum,CONVERT(VARCHAR(10), T0.docdate, 103) as docdate, T3.DocEntry,T0.CardCode, T0.CardName , T1.E_Mail,  T2.email + ',' + ISNULL((SELECT Email from OHEM where CAST(empid as nvarchar) = CAST(T4.Requester as nvarchar)),'') +',' + ISNULL((SELECT Email from OHEM where empid = T4.OwnerCode ),'') +',' +'jane.khoo@syspex.com' + ',' + CASE WHEN T5.ItmsGrpCod = '101' THEN 'venice.tan@syspex.com,rabby.cheng@syspex.com' ELSE '' END as [cc]  from OPOR T0 INNER JOIN OCRD T1 on T0.CardCode = T1.CardCode INNER JOIN OHEM T2 on T2.empID = T0.OwnerCode INNER JOIN POR1 T3 on T3.DocEntry = T0.DocEntry INNER JOIN OPRQ T4 on T4.DocEntry = T3.BaseEntry INNER JOIN OITM T5 on T5.ItemCode = T3.ItemCode where year(t0.DocDate) = year(getdate()) and month(t0.DocDate) = month(getdate())  and T0.DocNum not in (select DocNum from[AndriodAppDB].[dbo].[syspex_ePO] where Company = '" + CompanyCode + "') and T0.DocDate >='20200617' and T0.DocDate <= getdate() and T0.DocStatus = 'O'";
+                SQLQuery = "select  Distinct top 5  T0.DocNum,CONVERT(VARCHAR(10), T0.docdate, 103) as docdate, T3.DocEntry,T0.CardCode, T0.CardName , T1.E_Mail,  T2.email + ',' + ISNULL((SELECT Email from OHEM where CAST(empid as nvarchar) = CAST(T4.Requester as nvarchar)),'') +',' + ISNULL((SELECT Email from OHEM where empid = T4.OwnerCode ),'') +',' +',alice.foh@syspex.com,jane.khoo@syspex.com' + ',' + CASE WHEN T5.ItmsGrpCod = '101' THEN 'venice.tan@syspex.com,rabby.cheng@syspex.com' ELSE '' END as [cc]  from OPOR T0 INNER JOIN OCRD T1 on T0.CardCode = T1.CardCode INNER JOIN OHEM T2 on T2.empID = T0.OwnerCode INNER JOIN POR1 T3 on T3.DocEntry = T0.DocEntry INNER JOIN OPRQ T4 on T4.DocEntry = T3.BaseEntry INNER JOIN OITM T5 on T5.ItemCode = T3.ItemCode where year(t0.DocDate) = year(getdate()) and month(t0.DocDate) = month(getdate())  and T0.DocNum not in (select DocNum from[AndriodAppDB].[dbo].[syspex_ePO] where Company = '" + CompanyCode + "') and T0.DocDate >='20200617' and T0.DocDate <= getdate() and T0.DocStatus = 'O'";
             }
             DataSet dsetItem = new DataSet();
             SqlCommand CmdItem = new SqlCommand(SQLQuery, SQLConnection)
@@ -503,10 +465,13 @@ namespace SYSPEX_ePO_Console
             sb.AppendLine("<p>Reply back this email to confirm on the order quantity and the delivery date stated on the PO within the next 24 hours</p>");
             sb.AppendLine("<p>Kindly take note and comply with the following packaging and delivery information, </p>");
             sb.AppendLine("<ol>");
-            sb.AppendLine("<li>To indicate Syspex PO number for both Invoice and DO</li>");
-            sb.AppendLine("<li> To take note our receiving hours (Monday to Fridays 10:00am &ndash; 12:00 &amp; 1:00pm &ndash; 4:00pm) <strong>- Only applicable to supplier(s) deliver at Syspex Warehouse</strong></li>");
-            sb.AppendLine("<li> Please take note and comply that total height of incoming palletised goods should not exceed 1.5m. </ li>");
-            sb.AppendLine("<li> The pallet must be able to truck by hand pallet truck </li>");
+            sb.AppendLine("<li>To indicate Syspex PO number for both Invoice and DO.</li>");
+            sb.AppendLine("<li>To indicate serial number on each outer packaging (When applicable).</li>");
+            sb.AppendLine("<li> To take note our receiving hours (Monday to Fridays 10:00am &ndash; 12:00 &amp; 1:00pm &ndash; 4:00pm).<strong>- Only applicable to supplier(s) deliver at Syspex Warehouse</strong></li>");
+            sb.AppendLine("<li> Please take note and comply that total height of incoming palletised goods should not exceed 1.5m.</ li>");
+            sb.AppendLine("<li> The pallet must be able to truck by hand pallet truck.</li>");
+            sb.AppendLine("<li> Please email us soft copy of invoice and packing list once shipment ready for dispatch.</li>");
+            sb.AppendLine("<li> For multiple package shipment, please indicate content list on outside of each package.</li>");
             sb.AppendLine("</ol>");
             sb.AppendLine("<p>Thank you for your co-operation.</p>");
             sb.AppendLine("<p>Best Regards,</p>");
