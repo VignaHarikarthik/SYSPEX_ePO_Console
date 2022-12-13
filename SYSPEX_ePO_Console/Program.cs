@@ -205,7 +205,7 @@ namespace SYSPEX_ePO_Console
         {
             bool success;
             string Databasename = "";
-            //To = "vigna@syspex.com";
+           // To = "vigna@syspex.com";
 
             if (CompanyCode == "65ST")
                 Databasename = "SYSPEX_LIVE";
@@ -230,7 +230,8 @@ namespace SYSPEX_ePO_Console
 
                 if ((CompanyCode == "21SK") || (CompanyCode == "31SM"))
                     cryRpt.Load("F:\\Crystal Reports\\SYSPEX_PURCHASE_21SK&31SM.rpt");
-                
+
+                if (CompanyCode == "07ST")
                     cryRpt.Load("F:\\Crystal Reports\\SYSPEX_PURCHASE_07ST.rpt");
 
                 if (CompanyCode == "65ST")
@@ -409,8 +410,8 @@ namespace SYSPEX_ePO_Console
                 sb.AppendLine("',' +");
                 sb.AppendLine("--PR Owner Code if got multiple PR in one PO");
                 sb.AppendLine("ISNULL((SELECT STUFF ((SELECT ',' + Email from OHEM where CAST(empid as nvarchar) in ");
-                sb.AppendLine("(select TX.OwnerCode from OPRQ TX inner Join PRQ1 TY on Tx.DocEntry = Ty.DocEntry where Ty.TrgetEntry = T0.DocEntry ) FOR XML PATH('') ), 1, 1, '')),'') +");
-                sb.AppendLine("',' + 'SG.Procurement@syspex.com,winson.lee@syspex.com﻿' as [cc]");
+                sb.AppendLine("(select TX.OwnerCode from OPRQ TX inner Join PRQ1 TY on Tx.DocEntry = Ty.DocEntry where Ty.TrgetEntry = T0.DocEntry ) FOR XML PATH('') ), 1, 1, '')),'') + ',' + 'winson.lee@syspex.com' +");
+                sb.AppendLine("',' + 'SG.Procurement@syspex.com' as [cc]");
                 sb.AppendLine("from OPOR T0 INNER JOIN OCRD T1 on T0.CardCode = T1.CardCode INNER JOIN OHEM T2 on T2.empID = T0.OwnerCode");
                 sb.AppendLine("INNER JOIN POR1 T3 on T3.DocEntry = T0.DocEntry  where  T0.DocNum  ");
                 sb.AppendLine("not in (select DocNum from[AndriodAppDB].[dbo].[syspex_ePO] where Company = '" + CompanyCode + "') and  CAST(T0.U_ePO AS nvarchar(max)) ='Yes' and T0.DocDate <= getdate() and T0.DocStatus = 'O'");
@@ -421,6 +422,7 @@ namespace SYSPEX_ePO_Console
             {
                 //Go Live 20-06-17
                 SQLConnection = KLConnection;
+
                 SQLQuery = "select  Distinct top 5  T0.DocNum,CONVERT(VARCHAR(10), T0.docdate, 103) as docdate, T3.DocEntry,T0.CardCode, T0.CardName , " +
                     "T1.E_Mail,  T2.email + ',' + ISNULL((SELECT Email from OHEM where CAST(empid as nvarchar) = CAST(T4.Requester as nvarchar)),'') +',' + " +
                     "ISNULL((SELECT Email from OHEM where empid = T4.OwnerCode ),'') + ',alice.foh@syspex.com,jane.khoo@syspex.com' +',' +" +
