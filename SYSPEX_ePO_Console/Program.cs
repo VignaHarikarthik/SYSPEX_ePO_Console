@@ -205,7 +205,7 @@ namespace SYSPEX_ePO_Console
         {
             bool success;
             string Databasename = "";
-           // To = "vigna@syspex.com";
+            // To = "vigna@syspex.com";
 
             if (CompanyCode == "65ST")
                 Databasename = "SYSPEX_LIVE";
@@ -302,20 +302,10 @@ namespace SYSPEX_ePO_Console
 
                 mm.IsBodyHtml = true;
                 mm.Subject = VendorName + " " + ": " + "PO#" + DocNum;
-                if (CompanyCode != "65ST")
-                {
-                    //mm.Subject = " Purchase Order No:" + DocNum;
-                    mm.Body = "<p>Dear Valued Supplier,</p> <p>Attached please find our PO number " + DocNum + ", if you have any questions please call us immediately.</p>" +
-                        "<p> Regards,</p>" +
-          "<p> Procurement Team</p> ";
 
+                mm.Body = ST_HTMLBULIDER(DocNum, CompanyCode);
+                //  mm.To.Add("vigna@syspex.com");
 
-                }
-                else
-                {
-                    mm.Body = ST_HTMLBULIDER(DocNum);
-                    //  mm.To.Add("vigna@syspex.com");
-                }
 
 
                 foreach (var address in CC.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries).Distinct())
@@ -410,7 +400,7 @@ namespace SYSPEX_ePO_Console
                 sb.AppendLine("',' +");
                 sb.AppendLine("--PR Owner Code if got multiple PR in one PO");
                 sb.AppendLine("ISNULL((SELECT STUFF ((SELECT ',' + Email from OHEM where CAST(empid as nvarchar) in ");
-                sb.AppendLine("(select TX.OwnerCode from OPRQ TX inner Join PRQ1 TY on Tx.DocEntry = Ty.DocEntry where Ty.TrgetEntry = T0.DocEntry ) FOR XML PATH('') ), 1, 1, '')),'') + ',' + 'winson.lee@syspex.com' +");
+                sb.AppendLine("(select TX.OwnerCode from OPRQ TX inner Join PRQ1 TY on Tx.DocEntry = Ty.DocEntry where Ty.TrgetEntry = T0.DocEntry ) FOR XML PATH('') ), 1, 1, '')),'') + ',' + 'procurement@syspex.com' +");
                 sb.AppendLine("',' + 'SG.Procurement@syspex.com' as [cc]");
                 sb.AppendLine("from OPOR T0 INNER JOIN OCRD T1 on T0.CardCode = T1.CardCode INNER JOIN OHEM T2 on T2.empID = T0.OwnerCode");
                 sb.AppendLine("INNER JOIN POR1 T3 on T3.DocEntry = T0.DocEntry  where  T0.DocNum  ");
@@ -470,7 +460,8 @@ namespace SYSPEX_ePO_Console
             SQLConnection.Close();
             return dsetItem;
         }
-        private static string ST_HTMLBULIDER(string DocNum)
+
+        private static string ST_HTMLBULIDER(string DocNum, string company_code)
         {
             //Create a new StringBuilder object
             StringBuilder sb = new StringBuilder();
@@ -482,7 +473,16 @@ namespace SYSPEX_ePO_Console
             sb.AppendLine("<ol>");
             sb.AppendLine("<li>To indicate Syspex PO number for both Invoice and DO.</li>");
             sb.AppendLine("<li>To indicate serial number on each outer packaging (When applicable).</li>");
-            sb.AppendLine("<li> To take note our receiving hours (Monday to Fridays 10:00am &ndash; 12:00 &amp; 1:00pm &ndash; 4:00pm).<strong>- Only applicable to supplier(s) deliver at Syspex Warehouse</strong></li>");
+
+            if (company_code == "03SM")
+                sb.AppendLine("<li> To take note our receiving hours (Monday to Thursday 08:30am &ndash; 12:00 &amp; 1:00pm &ndash; 5:30pm and Friday 08:30am &ndash; 1:00 &amp; 2:30pm &ndash; 5:30pm ).<strong>- Only applicable to supplier(s) deliver at Syspex Warehouse</strong></li>");
+            if (company_code == "07ST")
+                sb.AppendLine("<li> To take note our receiving hours (Monday to Thursday 08:00am &ndash; 12:30 &amp; 1:30pm &ndash; 5:00pm and Friday 08:00am &ndash; 12:30 &amp; 2:30pm &ndash; 5:00pm ).<strong>- Only applicable to supplier(s) deliver at Syspex Warehouse</strong></li>");
+            if (company_code == "04SI")
+                sb.AppendLine("<li> To take note our receiving hours (Monday to Thursday 08:00am &ndash; 12:00 &amp; 1:00pm &ndash; 5:00pm and Friday 08:00am &ndash; 12:00 &amp; 2:00pm &ndash; 5:00pm ).<strong>- Only applicable to supplier(s) deliver at Syspex Warehouse</strong></li>");
+            if (company_code == "65ST")
+                sb.AppendLine("<li> To take note our receiving hours (Monday to Fridays 10:00am &ndash; 12:00 &amp; 1:00pm &ndash; 4:00pm).<strong>- Only applicable to supplier(s) deliver at Syspex Warehouse</strong></li>");
+
             sb.AppendLine("<li> Please take note and comply that total height of incoming palletised goods should not exceed 1.5m.</ li>");
             sb.AppendLine("<li> The pallet must be able to truck by hand pallet truck.</li>");
             sb.AppendLine("<li> Please email us soft copy of invoice and packing list once shipment ready for dispatch.</li>");
