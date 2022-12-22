@@ -302,8 +302,19 @@ namespace SYSPEX_ePO_Console
 
                 mm.IsBodyHtml = true;
                 mm.Subject = VendorName + " " + ": " + "PO#" + DocNum;
+                if (CompanyCode == "65ST")
+                    mm.Body = SG_HTMLBuilder(DocNum);
 
-                mm.Body = ST_HTMLBULIDER(DocNum, CompanyCode);
+                if (CompanyCode == "04SI")
+                    mm.Body = PG_HTMLBuilder(DocNum);
+
+                if (CompanyCode == "03SM")
+                    mm.Body = KL_HTMLBuilder(DocNum);
+
+                if (CompanyCode == "07ST")
+                    mm.Body = JB_HTMLBuilder(DocNum);
+
+
                 //  mm.To.Add("vigna@syspex.com");
 
 
@@ -461,11 +472,10 @@ namespace SYSPEX_ePO_Console
             return dsetItem;
         }
 
-        private static string ST_HTMLBULIDER(string DocNum, string company_code)
+        private static string SG_HTMLBuilder(string DocNum)
         {
             //Create a new StringBuilder object
             StringBuilder sb = new StringBuilder();
-
             sb.AppendLine("<p>Dear Supplier,</p>");
             sb.AppendLine("<p>Please find <strong><u>PO# " + DocNum + "</u></strong> and file attachments.</p>");
             sb.AppendLine("<p>Reply back this email to confirm on the order quantity and the delivery date stated on the PO within the next 24 hours</p>");
@@ -473,16 +483,7 @@ namespace SYSPEX_ePO_Console
             sb.AppendLine("<ol>");
             sb.AppendLine("<li>To indicate Syspex PO number for both Invoice and DO.</li>");
             sb.AppendLine("<li>To indicate serial number on each outer packaging (When applicable).</li>");
-
-            if (company_code == "03SM")
-                sb.AppendLine("<li> To take note our receiving hours (Monday to Thursday 08:30am &ndash; 12:00 &amp; 1:00pm &ndash; 5:30pm and Friday 08:30am &ndash; 1:00 &amp; 2:30pm &ndash; 5:30pm ).<strong>- Only applicable to supplier(s) deliver at Syspex Warehouse</strong></li>");
-            if (company_code == "07ST")
-                sb.AppendLine("<li> To take note our receiving hours (Monday to Thursday 08:00am &ndash; 12:30 &amp; 1:30pm &ndash; 5:00pm and Friday 08:00am &ndash; 12:30 &amp; 2:30pm &ndash; 5:00pm ).<strong>- Only applicable to supplier(s) deliver at Syspex Warehouse</strong></li>");
-            if (company_code == "04SI")
-                sb.AppendLine("<li> To take note our receiving hours (Monday to Thursday 08:00am &ndash; 12:00 &amp; 1:00pm &ndash; 5:00pm and Friday 08:00am &ndash; 12:00 &amp; 2:00pm &ndash; 5:00pm ).<strong>- Only applicable to supplier(s) deliver at Syspex Warehouse</strong></li>");
-            if (company_code == "65ST")
-                sb.AppendLine("<li> To take note our receiving hours (Monday to Fridays 10:00am &ndash; 12:00 &amp; 1:00pm &ndash; 4:00pm).<strong>- Only applicable to supplier(s) deliver at Syspex Warehouse</strong></li>");
-
+            sb.AppendLine("<li> To take note our receiving hours (Monday to Fridays 10:00am &ndash; 12:00 &amp; 1:00pm &ndash; 4:00pm).<strong>- Only applicable to supplier(s) deliver at Syspex Warehouse</strong></li>");
             sb.AppendLine("<li> Please take note and comply that total height of incoming palletised goods should not exceed 1.5m.</ li>");
             sb.AppendLine("<li> The pallet must be able to truck by hand pallet truck.</li>");
             sb.AppendLine("<li> Please email us soft copy of invoice and packing list once shipment ready for dispatch.</li>");
@@ -493,6 +494,87 @@ namespace SYSPEX_ePO_Console
             sb.AppendLine("<p>Syspex Procurement Team</p>");
             return sb.ToString();
         }
+        private static string KL_HTMLBuilder(string docnum)
+        {
+            //Create a new StringBuilder object
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("<p>Dear Supplier,</p>");
+            sb.AppendLine("<p>Please find <strong><u>PO# " + docnum + "</u></strong>&nbsp;and file attachments.</p>");
+            sb.AppendLine("<p><strong><u>Please acknowledge this email</u></strong> to <strong><u>confirm on the</u></strong><u> <strong>order quantity and the delivery date</strong></u> stated on the PO <strong><u>within the next 24 hours</u></strong></p>");
+            sb.AppendLine("<p>Kindly take note and comply with the following packaging and delivery information,</p>");
+            sb.AppendLine("<ol>");
+            sb.AppendLine("<li>To indicate Syspex PO number for both Invoice and DO.</li>");
+            sb.AppendLine("<li>To indicate item description &amp; serial number on each outer packaging (When applicable).</li>");
+            sb.AppendLine("<li>To take note our receiving hours as below:</li>");
+            sb.AppendLine("</ol>");
+            sb.AppendLine("<p>Monday to Thursday: 8:30am &ndash; 12:00pm &amp; 1:00pm &ndash; 5:30pm</p>");
+            sb.AppendLine("<p>Friday: 8.30am &ndash; 1:00pm &amp; 2:30pm &ndash; 5:30pm</p>");
+            sb.AppendLine("<p><strong>- Only applicable to supplier(s) deliver at Syspex Warehouse</strong></p>");
+            sb.AppendLine("<ol>");
+            sb.AppendLine("<li>The pallet must be able to truck by hand pallet truck.</li>");
+            sb.AppendLine("<li>Please email us soft copy of invoice and packing list once shipment ready for dispatch.</li>");
+            sb.AppendLine("<li>For multiple package shipment, please indicate item description on outside of each package.</li>");
+            sb.AppendLine("</ol>");
+            sb.AppendLine("<p>Thank you for your co-operation.</p>");
+            sb.AppendLine("<p>Best Regards,</p>");
+            sb.AppendLine("<p>Syspex Purchasing Team</p>");
+
+            return sb.ToString();
+        }
+        private static string JB_HTMLBuilder(string docnum)
+        {
+            //Create a new StringBuilder object
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("<p>Dear Supplier,</p>");
+            sb.AppendLine("<p>Please find <strong><u>PO# " + docnum + "</u></strong> and file attachments.</p>");
+            sb.AppendLine("<p><strong><u>Please acknowledge this email</u></strong> to <strong><u>confirm on the</u></strong><u> <strong>order quantity and the delivery date</strong></u> stated on the PO <strong><u>within the next 24 hours</u></strong></p>");
+            sb.AppendLine("<p>Kindly take note and comply with the following packaging and delivery information,</p>");
+            sb.AppendLine("<ol>");
+            sb.AppendLine("<li>To indicate Syspex PO number for both Invoice and DO.</li>");
+            sb.AppendLine("<li>To indicate item description &amp; serial number on each outer packaging (When applicable).</li>");
+            sb.AppendLine("<li>To take note our receiving hours as below:</li>");
+            sb.AppendLine("</ol>");
+            sb.AppendLine("<p>Monday to Thursday: 8:00am &ndash; 12:30pm &amp; 1:30pm &ndash; 5:00pm</p>");
+            sb.AppendLine("<p>Friday: 8.00am &ndash; 12:30pm &amp; 2:30pm &ndash; 5:00pm</p>");
+            sb.AppendLine("<p><strong>- Only applicable to supplier(s) deliver at Syspex Warehouse</strong></p>");
+            sb.AppendLine("<ol>");
+            sb.AppendLine("<li>The pallet must be able to truck by hand pallet truck.</li>");
+            sb.AppendLine("<li>Please email us soft copy of invoice and packing list once shipment ready for dispatch.</li>");
+            sb.AppendLine("<li>For multiple package shipment, please indicate item description on outside of each package.</li>");
+            sb.AppendLine("</ol>");
+            sb.AppendLine("<p>Thank you for your co-operation.</p>");
+            sb.AppendLine("<p>Best Regards,</p>");
+            sb.AppendLine("<p>Syspex Purchasing Team</p>");
+            return sb.ToString();
+        }
+
+        private static string PG_HTMLBuilder(string docnum)
+        {
+            //Create a new StringBuilder object
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("<p>Dear Supplier,</p>");
+            sb.AppendLine("<p>Please find <strong><u>PO# " + docnum + "</u></strong>&nbsp;and file attachments.</p>");
+            sb.AppendLine("<p><strong><u>Please acknowledge this email</u></strong> to <strong><u>confirm on the</u></strong><u> <strong>order quantity and the delivery date</strong></u> stated on the PO <strong><u>within the next 24 hours</u></strong></p>");
+            sb.AppendLine("<p>Kindly take note and comply with the following packaging and delivery information,</p>");
+            sb.AppendLine("<ol>");
+            sb.AppendLine("<li>To indicate Syspex PO number for both Invoice and DO.</li>");
+            sb.AppendLine("<li>To indicate item description &amp; serial number on each outer packaging (When applicable).</li>");
+            sb.AppendLine("<li>To take note our receiving hours as below:</li>");
+            sb.AppendLine("</ol>");
+            sb.AppendLine("<p>Monday to Thursday: 8:00am &ndash; 12:00pm &amp; 1:00pm &ndash; 5:00pm</p>");
+            sb.AppendLine("<p>Friday: 8.00am &ndash; 12:00pm &amp; 2:00pm &ndash; 5:00pm</p>");
+            sb.AppendLine("<p><strong>- Only applicable to supplier(s) deliver at Syspex Warehouse</strong></p>");
+            sb.AppendLine("<ol>");
+            sb.AppendLine("<li>The pallet must be able to truck by hand pallet truck.</li>");
+            sb.AppendLine("<li>Please email us soft copy of invoice and packing list once shipment ready for dispatch.</li>");
+            sb.AppendLine("<li>For multiple package shipment, please indicate item description on outside of each package.</li>");
+            sb.AppendLine("</ol>");
+            sb.AppendLine("<p>Thank you for your co-operation.</p>");
+            sb.AppendLine("<p>Best Regards,</p>");
+            sb.AppendLine("<p>Syspex Purchasing Team</p>");
+            return sb.ToString();
+        }
+
     }
 
 
