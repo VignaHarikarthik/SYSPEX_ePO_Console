@@ -502,15 +502,15 @@ namespace SYSPEX_ePO_Console
             sb.AppendLine("<p>Please find <strong><u>PO# " + docnum + "</u></strong>&nbsp;and file attachments.</p>");
             sb.AppendLine("<p><strong><u>Please acknowledge this email</u></strong> to <strong><u>confirm on the</u></strong><u> <strong>order quantity and the delivery date</strong></u> stated on the PO <strong><u>within the next 24 hours</u></strong></p>");
             sb.AppendLine("<p>Kindly take note and comply with the following packaging and delivery information,</p>");
-            sb.AppendLine("<ol>");
+            sb.AppendLine("<ol start=\"1\">");
             sb.AppendLine("<li>To indicate Syspex PO number for both Invoice and DO.</li>");
             sb.AppendLine("<li>To indicate item description &amp; serial number on each outer packaging (When applicable).</li>");
             sb.AppendLine("<li>To take note our receiving hours as below:</li>");
-            sb.AppendLine("</ol>");
+            sb.AppendLine("<ol");
             sb.AppendLine("<p>Monday to Thursday: 8:30am &ndash; 12:00pm &amp; 1:00pm &ndash; 5:30pm</p>");
             sb.AppendLine("<p>Friday: 8.30am &ndash; 1:00pm &amp; 2:30pm &ndash; 5:30pm</p>");
             sb.AppendLine("<p><strong>- Only applicable to supplier(s) deliver at Syspex Warehouse</strong></p>");
-            sb.AppendLine("<ol>");
+            sb.AppendLine("<ol start=\"4\">");
             sb.AppendLine("<li>The pallet must be able to truck by hand pallet truck.</li>");
             sb.AppendLine("<li>Please email us soft copy of invoice and packing list once shipment ready for dispatch.</li>");
             sb.AppendLine("<li>For multiple package shipment, please indicate item description on outside of each package.</li>");
@@ -529,7 +529,7 @@ namespace SYSPEX_ePO_Console
             sb.AppendLine("<p>Please find <strong><u>PO# " + docnum + "</u></strong> and file attachments.</p>");
             sb.AppendLine("<p><strong><u>Please acknowledge this email</u></strong> to <strong><u>confirm on the</u></strong><u> <strong>order quantity and the delivery date</strong></u> stated on the PO <strong><u>within the next 24 hours</u></strong></p>");
             sb.AppendLine("<p>Kindly take note and comply with the following packaging and delivery information,</p>");
-            sb.AppendLine("<ol>");
+            sb.AppendLine("<ol start=\"1\">");
             sb.AppendLine("<li>To indicate Syspex PO number for both Invoice and DO.</li>");
             sb.AppendLine("<li>To indicate item description &amp; serial number on each outer packaging (When applicable).</li>");
             sb.AppendLine("<li>To take note our receiving hours as below:</li>");
@@ -537,7 +537,7 @@ namespace SYSPEX_ePO_Console
             sb.AppendLine("<p>Monday to Thursday: 8:00am &ndash; 12:30pm &amp; 1:30pm &ndash; 5:00pm</p>");
             sb.AppendLine("<p>Friday: 8.00am &ndash; 12:30pm &amp; 2:30pm &ndash; 5:00pm</p>");
             sb.AppendLine("<p><strong>- Only applicable to supplier(s) deliver at Syspex Warehouse</strong></p>");
-            sb.AppendLine("<ol>");
+            sb.AppendLine("<ol start=\"4\">");
             sb.AppendLine("<li>The pallet must be able to truck by hand pallet truck.</li>");
             sb.AppendLine("<li>Please email us soft copy of invoice and packing list once shipment ready for dispatch.</li>");
             sb.AppendLine("<li>For multiple package shipment, please indicate item description on outside of each package.</li>");
@@ -556,7 +556,7 @@ namespace SYSPEX_ePO_Console
             sb.AppendLine("<p>Please find <strong><u>PO# " + docnum + "</u></strong>&nbsp;and file attachments.</p>");
             sb.AppendLine("<p><strong><u>Please acknowledge this email</u></strong> to <strong><u>confirm on the</u></strong><u> <strong>order quantity and the delivery date</strong></u> stated on the PO <strong><u>within the next 24 hours</u></strong></p>");
             sb.AppendLine("<p>Kindly take note and comply with the following packaging and delivery information,</p>");
-            sb.AppendLine("<ol>");
+            sb.AppendLine("<ol start=\"1\">");
             sb.AppendLine("<li>To indicate Syspex PO number for both Invoice and DO.</li>");
             sb.AppendLine("<li>To indicate item description &amp; serial number on each outer packaging (When applicable).</li>");
             sb.AppendLine("<li>To take note our receiving hours as below:</li>");
@@ -564,7 +564,7 @@ namespace SYSPEX_ePO_Console
             sb.AppendLine("<p>Monday to Thursday: 8:00am &ndash; 12:00pm &amp; 1:00pm &ndash; 5:00pm</p>");
             sb.AppendLine("<p>Friday: 8.00am &ndash; 12:00pm &amp; 2:00pm &ndash; 5:00pm</p>");
             sb.AppendLine("<p><strong>- Only applicable to supplier(s) deliver at Syspex Warehouse</strong></p>");
-            sb.AppendLine("<ol>");
+            sb.AppendLine("<ol start=\"4\">");
             sb.AppendLine("<li>The pallet must be able to truck by hand pallet truck.</li>");
             sb.AppendLine("<li>Please email us soft copy of invoice and packing list once shipment ready for dispatch.</li>");
             sb.AppendLine("<li>For multiple package shipment, please indicate item description on outside of each package.</li>");
