@@ -426,11 +426,11 @@ namespace SYSPEX_ePO_Console
 
                 SQLQuery = "select  Distinct top 5  T0.DocNum,CONVERT(VARCHAR(10), T0.docdate, 103) as docdate, T3.DocEntry,T0.CardCode, T0.CardName , " +
                     "T1.E_Mail,  T2.email + ',' + ISNULL((SELECT Email from OHEM where CAST(empid as nvarchar) = CAST(T4.Requester as nvarchar)),'') +',' + " +
-                    "ISNULL((SELECT Email from OHEM where empid = T4.OwnerCode ),'') + ',alice.foh@syspex.com,jane.khoo@syspex.com' +',' +" +
-                    " CASE WHEN T5.ItmsGrpCod = '101' THEN 'venice.tan@syspex.com,daphne.lee@syspex.com,peyyin.lim@syspex.com' ELSE '' END as [cc] " +
+                    "ISNULL((SELECT Email from OHEM where empid = T4.OwnerCode ),'') + ',alice.foh@syspex.com,jane.khoo@syspex.com,vigna@syspex.com' +',' +" +
+                    " CASE WHEN T5.SlpName like  'TE01%'  THEN 'venice.tan@syspex.com,daphne.lee@syspex.com,peyyin.lim@syspex.com,vigna@syspex.com' ELSE '' END as [cc] " +
                     " from OPOR T0 INNER JOIN OCRD T1 on T0.CardCode = T1.CardCode INNER JOIN OHEM T2 on T2.empID = T0.OwnerCode INNER JOIN POR1 " +
                     "T3 on T3.DocEntry = T0.DocEntry INNER JOIN OPRQ T4 on T4.DocEntry = T3.BaseEntry " +
-                    "INNER JOIN OITM T5 on T5.ItemCode = T3.ItemCode where year(t0.DocDate) = year(getdate()) and month(t0.DocDate) = month(getdate()) " +
+                    "INNER JOIN OSLP T5 on T5.SlpCode = T0.SlpCode where year(t0.DocDate) = year(getdate()) and month(t0.DocDate) = month(getdate()) " +
                     " and T0.DocNum not in (select DocNum from[AndriodAppDB].[dbo].[syspex_ePO] where Company = '" + CompanyCode + "') and T0.DocDate >='20200617' and CAST(T0.U_equote AS nvarchar(max)) ='Yes' and T0.DocDate <= getdate() and T0.DocStatus = 'O'";
             }
 
@@ -440,8 +440,8 @@ namespace SYSPEX_ePO_Console
                 SQLConnection = JBConnection;
                 SQLQuery = "select  Distinct top 5  T0.DocNum,CONVERT(VARCHAR(10), T0.docdate, 103) as docdate, T3.DocEntry,T0.CardCode, T0.CardName , T1.E_Mail,  T2.email + ',' " +
                     "+ ISNULL((SELECT Email from OHEM where CAST(empid as nvarchar) = CAST(T4.Requester as nvarchar)),'') +',' +'liyin.kee@syspex.com,' + ISNULL((SELECT Email from OHEM where empid = T4.OwnerCode ),'') + ',' + " +
-                    "CASE WHEN T5.ItmsGrpCod = '101' THEN 'peyyin.lim@syspex.com,venice.tan@syspex.com,liyin.kee@syspex.com' ELSE '' END   as [cc]  from OPOR T0 INNER JOIN OCRD T1 on T0.CardCode = T1.CardCode INNER JOIN OHEM T2 on T2.empID = T0.OwnerCode INNER JOIN POR1 T3 on T3.DocEntry = T0.DocEntry" +
-                    " INNER JOIN OPRQ T4 on T4.DocEntry = T3.BaseEntry INNER JOIN OITM T5 on T5.ItemCode = T3.ItemCode where year(t0.DocDate) = year(getdate()) and month(t0.DocDate) = month(getdate())  and T0.DocNum not in (select DocNum from[AndriodAppDB].[dbo].[syspex_ePO] where Company = '" + CompanyCode + "') " +
+                    "CASE WHEN T5.SlpName like  'TE01%' THEN 'peyyin.lim@syspex.com,venice.tan@syspex.com,liyin.kee@syspex.com' ELSE '' END   as [cc]  from OPOR T0 INNER JOIN OCRD T1 on T0.CardCode = T1.CardCode INNER JOIN OHEM T2 on T2.empID = T0.OwnerCode INNER JOIN POR1 T3 on T3.DocEntry = T0.DocEntry" +
+                    " INNER JOIN OPRQ T4 on T4.DocEntry = T3.BaseEntry INNER JOIN OSLP T5 on T5.SlpCode = T0.SlpCode where year(t0.DocDate) = year(getdate()) and month(t0.DocDate) = month(getdate())  and T0.DocNum not in (select DocNum from[AndriodAppDB].[dbo].[syspex_ePO] where Company = '" + CompanyCode + "') " +
                     "and T0.DocDate >='20200622' and CAST(T0.U_equote AS nvarchar(max)) ='Yes' and  T0.DocDate <= getdate()  and T0.DocStatus = 'O'";
             }
 
@@ -500,17 +500,17 @@ namespace SYSPEX_ePO_Console
             StringBuilder sb = new StringBuilder();
             sb.AppendLine("<p>Dear Supplier,</p>");
             sb.AppendLine("<p>Please find <strong><u>PO# " + docnum + "</u></strong>&nbsp;and file attachments.</p>");
-            sb.AppendLine("<p><strong><u>Please acknowledge this email</u></strong> to <strong><u>confirm on the</u></strong><u> <strong>order quantity and the delivery date</strong></u> stated on the PO <strong><u>within the next 24 hours</u></strong></p>");
+            sb.AppendLine("<p><strong><u>Please acknowledge this email</u></strong> to <strong><u>confirm on the</u></strong> <strong><u>order quantity and the delivery date</u></strong> stated on the PO <strong><u>within the next 24 hours</u></strong></p>");
             sb.AppendLine("<p>Kindly take note and comply with the following packaging and delivery information,</p>");
-            sb.AppendLine("<ol start=\"1\">");
+            sb.AppendLine("<ol>");
             sb.AppendLine("<li>To indicate Syspex PO number for both Invoice and DO.</li>");
             sb.AppendLine("<li>To indicate item description &amp; serial number on each outer packaging (When applicable).</li>");
             sb.AppendLine("<li>To take note our receiving hours as below:</li>");
-            sb.AppendLine("<ol");
-            sb.AppendLine("<p>Monday to Thursday: 8:30am &ndash; 12:00pm &amp; 1:00pm &ndash; 5:30pm</p>");
-            sb.AppendLine("<p>Friday: 8.30am &ndash; 1:00pm &amp; 2:30pm &ndash; 5:30pm</p>");
+            sb.AppendLine("</ol>");
+            sb.AppendLine("    <p align=\"center\">Monday to Thursday: 8:30am &ndash; 12:00pm &amp; 1:00pm &ndash; 5:30pm</p>");
+            sb.AppendLine("<p align=\"center\">Friday: 8.30am &ndash; 1:00pm &amp; 2:30pm &ndash; 5:30pm</p>");
             sb.AppendLine("<p><strong>- Only applicable to supplier(s) deliver at Syspex Warehouse</strong></p>");
-            sb.AppendLine("<ol start=\"4\">");
+            sb.AppendLine("<ol start=4>");
             sb.AppendLine("<li>The pallet must be able to truck by hand pallet truck.</li>");
             sb.AppendLine("<li>Please email us soft copy of invoice and packing list once shipment ready for dispatch.</li>");
             sb.AppendLine("<li>For multiple package shipment, please indicate item description on outside of each package.</li>");
@@ -518,6 +518,7 @@ namespace SYSPEX_ePO_Console
             sb.AppendLine("<p>Thank you for your co-operation.</p>");
             sb.AppendLine("<p>Best Regards,</p>");
             sb.AppendLine("<p>Syspex Purchasing Team</p>");
+
 
             return sb.ToString();
         }
@@ -529,15 +530,15 @@ namespace SYSPEX_ePO_Console
             sb.AppendLine("<p>Please find <strong><u>PO# " + docnum + "</u></strong> and file attachments.</p>");
             sb.AppendLine("<p><strong><u>Please acknowledge this email</u></strong> to <strong><u>confirm on the</u></strong><u> <strong>order quantity and the delivery date</strong></u> stated on the PO <strong><u>within the next 24 hours</u></strong></p>");
             sb.AppendLine("<p>Kindly take note and comply with the following packaging and delivery information,</p>");
-            sb.AppendLine("<ol start=\"1\">");
+            sb.AppendLine("<ol>");
             sb.AppendLine("<li>To indicate Syspex PO number for both Invoice and DO.</li>");
             sb.AppendLine("<li>To indicate item description &amp; serial number on each outer packaging (When applicable).</li>");
             sb.AppendLine("<li>To take note our receiving hours as below:</li>");
             sb.AppendLine("</ol>");
-            sb.AppendLine("<p>Monday to Thursday: 8:00am &ndash; 12:30pm &amp; 1:30pm &ndash; 5:00pm</p>");
-            sb.AppendLine("<p>Friday: 8.00am &ndash; 12:30pm &amp; 2:30pm &ndash; 5:00pm</p>");
+            sb.AppendLine("<p align=\"center\">Monday to Thursday: 8:00am &ndash; 12:30pm &amp; 1:30pm &ndash; 5:00pm</p>");
+            sb.AppendLine("<p align=\"center\">Friday: 8.00am &ndash; 12:30pm &amp; 2:30pm &ndash; 5:00pm</p>");
             sb.AppendLine("<p><strong>- Only applicable to supplier(s) deliver at Syspex Warehouse</strong></p>");
-            sb.AppendLine("<ol start=\"4\">");
+            sb.AppendLine("<ol start=4>");
             sb.AppendLine("<li>The pallet must be able to truck by hand pallet truck.</li>");
             sb.AppendLine("<li>Please email us soft copy of invoice and packing list once shipment ready for dispatch.</li>");
             sb.AppendLine("<li>For multiple package shipment, please indicate item description on outside of each package.</li>");
@@ -545,6 +546,7 @@ namespace SYSPEX_ePO_Console
             sb.AppendLine("<p>Thank you for your co-operation.</p>");
             sb.AppendLine("<p>Best Regards,</p>");
             sb.AppendLine("<p>Syspex Purchasing Team</p>");
+
             return sb.ToString();
         }
 
@@ -552,26 +554,27 @@ namespace SYSPEX_ePO_Console
         {
             //Create a new StringBuilder object
             StringBuilder sb = new StringBuilder();
-            sb.AppendLine("<p>Dear Supplier,</p>");
-            sb.AppendLine("<p>Please find <strong><u>PO# " + docnum + "</u></strong>&nbsp;and file attachments.</p>");
-            sb.AppendLine("<p><strong><u>Please acknowledge this email</u></strong> to <strong><u>confirm on the</u></strong><u> <strong>order quantity and the delivery date</strong></u> stated on the PO <strong><u>within the next 24 hours</u></strong></p>");
-            sb.AppendLine("<p>Kindly take note and comply with the following packaging and delivery information,</p>");
-            sb.AppendLine("<ol start=\"1\">");
-            sb.AppendLine("<li>To indicate Syspex PO number for both Invoice and DO.</li>");
-            sb.AppendLine("<li>To indicate item description &amp; serial number on each outer packaging (When applicable).</li>");
-            sb.AppendLine("<li>To take note our receiving hours as below:</li>");
+            sb.AppendLine("<p><span>Dear Supplier,</span></p>");
+            sb.AppendLine("<p><span>Please find<span>&nbsp;</span><strong><u>PO# " + docnum + "</u></strong>&nbsp;and file attachments.</span></p>");
+            sb.AppendLine("<p><strong><u><span>Please acknowledge this email</span></u></strong><span><span>&nbsp;</span>to<span>&nbsp;</span><strong><u>confirm on the</u></strong><u><span>&nbsp;</span><strong>order quantity and the delivery date</strong></u><span>&nbsp;</span>stated on the PO<span>&nbsp;</span><strong><u>within the next 24 hours</u></strong></span></p>");
+            sb.AppendLine("<p><span>Kindly take note and comply with the following packaging and delivery information,</span></p>");
+            sb.AppendLine("<ol>");
+            sb.AppendLine("<li><span>To indicate Syspex PO number for both Invoice and DO.</span></li>");
+            sb.AppendLine("<li><span>To indicate item description &amp; serial number on each outer packaging (When applicable).</span></li>");
+            sb.AppendLine("<li><span>To take note our receiving hours as below:</span></li>");
             sb.AppendLine("</ol>");
-            sb.AppendLine("<p>Monday to Thursday: 8:00am &ndash; 12:00pm &amp; 1:00pm &ndash; 5:00pm</p>");
-            sb.AppendLine("<p>Friday: 8.00am &ndash; 12:00pm &amp; 2:00pm &ndash; 5:00pm</p>");
-            sb.AppendLine("<p><strong>- Only applicable to supplier(s) deliver at Syspex Warehouse</strong></p>");
-            sb.AppendLine("<ol start=\"4\">");
-            sb.AppendLine("<li>The pallet must be able to truck by hand pallet truck.</li>");
-            sb.AppendLine("<li>Please email us soft copy of invoice and packing list once shipment ready for dispatch.</li>");
-            sb.AppendLine("<li>For multiple package shipment, please indicate item description on outside of each package.</li>");
+            sb.AppendLine("<p align=\"center\"><span>Monday to Thursday: 8:00am &ndash; 12:00pm &amp; 1:00pm &ndash; 5:00pm</span></p>");
+            sb.AppendLine("<p align=\"center\"><span>Friday: 8.00am &ndash; 12:00pm &amp; 2:00pm &ndash; 5:00pm</span></p>");
+            sb.AppendLine("<p ><strong><span>- Only applicable to supplier(s) deliver at Syspex Warehouse</span></strong></p>");
+            sb.AppendLine("<ol start=4>");
+            sb.AppendLine("<li><span>The pallet must be able to truck by hand pallet truck.</span></li>");
+            sb.AppendLine("<li><span>Please email us soft copy of invoice and packing list once shipment ready for dispatch.</span></li>");
+            sb.AppendLine("<li><span>For multiple package shipment, please indicate item description on outside of each package.</span></li>");
             sb.AppendLine("</ol>");
-            sb.AppendLine("<p>Thank you for your co-operation.</p>");
-            sb.AppendLine("<p>Best Regards,</p>");
-            sb.AppendLine("<p>Syspex Purchasing Team</p>");
+            sb.AppendLine("<p ><span>Thank you for your co-operation.</span></p>");
+            sb.AppendLine("<p><span>Best Regards,</span></p>");
+            sb.AppendLine("<p ><span>Syspex Purchasing Team</span></p>");
+
             return sb.ToString();
         }
 
