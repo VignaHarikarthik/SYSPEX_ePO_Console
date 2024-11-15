@@ -417,6 +417,7 @@ namespace SYSPEX_ePO_Console
                 sb.AppendLine("INNER JOIN POR1 T3 on T3.DocEntry = T0.DocEntry  where  T0.DocNum  ");
                 sb.AppendLine("not in (select DocNum from[AndriodAppDB].[dbo].[syspex_ePO] where Company = '" + CompanyCode + "') and  CAST(T0.U_ePO AS nvarchar(max)) ='Yes' and T0.DocDate <= getdate() and T0.DocStatus = 'O'");
                 SQLQuery = sb.ToString();
+                //changes
             }
 
             if (CompanyCode == "03SM")
