@@ -38,6 +38,10 @@ namespace SYSPEX_ePO_Console
             System.Threading.Thread.Sleep(100);
             EPO("04SI"); //Go Live on 22/06/20
             System.Threading.Thread.Sleep(100);
+            System.Threading.Thread.Sleep(100);
+            EPO("21SK"); //Go Live on 20240311
+            System.Threading.Thread.Sleep(100);
+            EPO("31SM"); //Go Live on 20240311
 
 
 
@@ -341,7 +345,7 @@ namespace SYSPEX_ePO_Console
                 }
                 else
                 {
-                    System.Net.NetworkCredential NetworkCred = new System.Net.NetworkCredential("noreply@syspex.com", "design360");
+                    System.Net.NetworkCredential NetworkCred = new System.Net.NetworkCredential("noreply@syspex.com", "vani ktfs dhxq phcl");
                     smtp.UseDefaultCredentials = true;
                     smtp.Credentials = NetworkCred;
                     smtp.Port = 587;
@@ -447,10 +451,64 @@ namespace SYSPEX_ePO_Console
             }
 
             if (CompanyCode == "21SK")
+            {
                 SQLConnection = JKConnection;
 
+                SQLQuery = @"select 
+                                Distinct top 5 
+                                T0.DocNum,
+                                CONVERT(VARCHAR(10), T0.DocDate, 103) as DocDate, 
+                                T3.DocEntry,
+                                T0.CardCode, 
+                                T0.CardName, 
+                                T1.E_Mail,
+                                '21skprocurement@syspex.com,procurement@syspex.com,' + ISNULL((SELECT Email from OHEM where CAST(empid as nvarchar) = CAST(T4.Requester as nvarchar)),'') + ',' + ISNULL((SELECT Email from OHEM where empid = T4.OwnerCode ),'') as [Cc]  
+                             from OPOR T0 
+                             INNER JOIN OCRD T1 on T0.CardCode = T1.CardCode
+                             INNER JOIN OHEM T2 on T2.empID = T0.OwnerCode
+                             INNER JOIN POR1 T3 on T3.DocEntry = T0.DocEntry
+                             INNER JOIN OPRQ T4 on T4.DocEntry = T3.BaseEntry 
+                             INNER JOIN OITM T5 on T5.ItemCode = T3.ItemCode 
+                             where year(T0.DocDate) = year(getdate()) 
+                             and month(T0.DocDate) = month(getdate())
+                             and T0.DocNum not in (select DocNum from [AndriodAppDB].[dbo].[syspex_ePO] where Company = '21SK') 
+                             and T0.DocDate >= '20240311' 
+                             and CAST(T0.U_equote AS nvarchar(max)) = 'Yes' 
+                             and T0.DocDate <= getdate() 
+                             and T0.DocStatus = 'O'
+                             order by T0.DocNum";
+            }
+
             if (CompanyCode == "31SM")
+            {
                 SQLConnection = SBConnection;
+
+                SQLQuery = @"select 
+                                Distinct top 5 
+                                T0.DocNum,
+                                CONVERT(VARCHAR(10), T0.DocDate, 103) as DocDate, 
+                                T3.DocEntry,
+                                T0.CardCode, 
+                                T0.CardName, 
+                                T1.E_Mail,
+                                '21skprocurement@syspex.com,procurement@syspex.com,' + ISNULL((SELECT Email from OHEM where CAST(empid as nvarchar) = CAST(T4.Requester as nvarchar)),'') + ',' + ISNULL((SELECT Email from OHEM where empid = T4.OwnerCode ),'') as [Cc]  
+                             from OPOR T0 
+                             INNER JOIN OCRD T1 on T0.CardCode = T1.CardCode
+                             INNER JOIN OHEM T2 on T2.empID = T0.OwnerCode
+                             INNER JOIN POR1 T3 on T3.DocEntry = T0.DocEntry
+                             INNER JOIN OPRQ T4 on T4.DocEntry = T3.BaseEntry 
+                             INNER JOIN OITM T5 on T5.ItemCode = T3.ItemCode 
+                             where year(T0.DocDate) = year(getdate()) 
+                             and month(T0.DocDate) = month(getdate())
+                             and T0.DocNum not in (select DocNum from [AndriodAppDB].[dbo].[syspex_ePO] where Company = '31SM') 
+                             and T0.DocDate >= '20240311' 
+                             and CAST(T0.U_equote AS nvarchar(max)) = 'Yes' 
+                             and T0.DocDate <= getdate() 
+                             and T0.DocStatus = 'O'
+                             order by T0.DocNum";
+            }
+
+
 
             if (CompanyCode == "04SI")
             {
@@ -576,6 +634,91 @@ namespace SYSPEX_ePO_Console
             sb.AppendLine("<p><span>Best Regards,</span></p>");
             sb.AppendLine("<p ><span>Syspex Purchasing Team</span></p>");
 
+            return sb.ToString();
+        }
+        private static string JK_HTMLBuilder(string docnum)
+        {
+            //Create a new StringBuilder object
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("<p><strong><i>This email is made with dual language support (English - upper section and Indonesian - lower section) as can be seen on below</i></strong></p>");
+            sb.AppendLine("<p style=\"color:red;\"><strong><i>English version</i></strong></p>");
+            sb.AppendLine("<p><span>Dear Supplier,</span></p>");
+            sb.AppendLine("<p><span>Please find<span>&nbsp;</span><strong><u>PO# " + docnum + "</u></strong>&nbsp;and file attachment(s).</span></p>");
+            sb.AppendLine("<p><span>Reply back this email to confirm on the order quantity and the delivery date stated on the PO within the next 24 hours.</span></p>");
+            sb.AppendLine("<p><span>Kindly take note and comply with the following packaging and delivery information.</span></p>");
+            sb.AppendLine("<ol>");
+            sb.AppendLine("<li><span>To indicate Syspex PO number for both Invoice and DO.</span></li>");
+            sb.AppendLine("<li><span>To indicate serial number on each outer packaging (When applicable).</span></li>");
+            sb.AppendLine("<li><span>To take note our receiving hours (Monday to Fridays 08:00am – 12:00 & 1:00pm – 4:00pm). <strong>- Only applicable to supplier(s) deliver at Syspex Warehouse</strong></span></li>");
+            sb.AppendLine("<li><span>Please take note and comply that total height of incoming palletised goods should not exceed 2m.</span></li>");
+            sb.AppendLine("<li><span>The pallet must be able to truck by hand pallet truck.</span></li>");
+            sb.AppendLine("<li><span>Please email us soft copy of invoice and packing list once shipment ready for dispatch.</span></li>");
+            sb.AppendLine("<li><span>For multiple package shipment, please indicate content list on outside of each package.</span></li>");
+            sb.AppendLine("</ol>");
+            sb.AppendLine("<p><span>Thank you for your co-operation.</span></p>");
+            sb.AppendLine("<p><span>Best Regards,</span></p>");
+            sb.AppendLine("<p><span>Syspex Procurement Team</span></p>");
+            sb.AppendLine("<br><br>");
+            sb.AppendLine("<p style=\"color:red;\"><strong><i>Indonesian version</i></strong></p>");
+            sb.AppendLine("<p><span>Kepada Yth. Rekanan Syspex,</span></p>");
+            sb.AppendLine("<p><span>Terlampir adalah<span>&nbsp;</span><strong><u>PO# " + docnum + "</u></strong>&nbsp;dan lampiran yang diperlukan.</span></p>");
+            sb.AppendLine("<p><span>Mohon tolong balas kembali email ini untuk mengkonfirmasi jumlah dan tanggal pengiriman yang tertera pada PO dalam waktu 24 jam ke depan.</span></p>");
+            sb.AppendLine("<p><span>Harap perhatikan dan patuhi informasi pengemasan dan pengiriman berikut.</span></p>");
+            sb.AppendLine("<ol>");
+            sb.AppendLine("<li><span>Untuk menunjukkan nomor PO Syspex untuk Invoice dan DO.</span></li>");
+            sb.AppendLine("<li><span>Untuk menunjukkan nomor seri pada setiap kemasan luar (Bila ada).</span></li>");
+            sb.AppendLine("<li><span>Perhatikan jam penerimaan kami (Senin sampai Jumat 08:00 – 12:00 & 13:00 – 16:00). <strong>- Hanya berlaku untuk pengiriman di Gudang Syspex</strong></span></li>");
+            sb.AppendLine("<li><span>Harap perhatikan dan patuhi bahwa tinggi total barang palet yang masuk tidak boleh melebihi 2m.</span></li>");
+            sb.AppendLine("<li><span>Palet harus dapat diangkut dengan truk palet tangan.</span></li>");
+            sb.AppendLine("<li><span>Silakan kirim email kepada kami salinan faktur dan daftar pengepakan setelah pengiriman siap untuk dikirim.</span></li>");
+            sb.AppendLine("<li><span>Untuk pengiriman beberapa paket, harap cantumkan daftar konten di luar setiap paket.</span></li>");
+            sb.AppendLine("</ol>");
+            sb.AppendLine("<p><span>Terima kasih atas kerja sama anda.</span></p>");
+            sb.AppendLine("<p><span>Salam,</span></p>");
+            sb.AppendLine("<p><span>Tim Pengadaan Syspex</span></p>");
+            return sb.ToString();
+        }
+
+        private static string SB_HTMLBuilder(string docnum)
+        {
+            //Create a new StringBuilder object
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("<p><strong><i>This email is made with dual language support (English - upper section and Indonesian - lower section) as can be seen on below</i></strong></p>");
+            sb.AppendLine("<p style=\"color:red;\"><strong><i>English version</i></strong></p>");
+            sb.AppendLine("<p><span>Dear Supplier,</span></p>");
+            sb.AppendLine("<p><span>Please find<span>&nbsp;</span><strong><u>PO# " + docnum + "</u></strong>&nbsp;and file attachment(s).</span></p>");
+            sb.AppendLine("<p><span>Reply back this email to confirm on the order quantity and the delivery date stated on the PO within the next 24 hours.</span></p>");
+            sb.AppendLine("<p><span>Kindly take note and comply with the following packaging and delivery information.</span></p>");
+            sb.AppendLine("<ol>");
+            sb.AppendLine("<li><span>To indicate Syspex PO number for both Invoice and DO.</span></li>");
+            sb.AppendLine("<li><span>To indicate serial number on each outer packaging (When applicable).</span></li>");
+            sb.AppendLine("<li><span>To take note our receiving hours (Monday to Fridays 08:00am – 12:00 & 1:00pm – 4:00pm). <strong>- Only applicable to supplier(s) deliver at Syspex Warehouse</strong></span></li>");
+            sb.AppendLine("<li><span>Please take note and comply that total height of incoming palletised goods should not exceed 2m.</span></li>");
+            sb.AppendLine("<li><span>The pallet must be able to truck by hand pallet truck.</span></li>");
+            sb.AppendLine("<li><span>Please email us soft copy of invoice and packing list once shipment ready for dispatch.</span></li>");
+            sb.AppendLine("<li><span>For multiple package shipment, please indicate content list on outside of each package.</span></li>");
+            sb.AppendLine("</ol>");
+            sb.AppendLine("<p><span>Thank you for your co-operation.</span></p>");
+            sb.AppendLine("<p><span>Best Regards,</span></p>");
+            sb.AppendLine("<p><span>Syspex Procurement Team</span></p>");
+            sb.AppendLine("<br><br>");
+            sb.AppendLine("<p style=\"color:red;\"><strong><i>Indonesian version</i></strong></p>");
+            sb.AppendLine("<p><span>Kepada Yth. Rekanan Syspex,</span></p>");
+            sb.AppendLine("<p><span>Terlampir adalah<span>&nbsp;</span><strong><u>PO# " + docnum + "</u></strong>&nbsp;dan lampiran yang diperlukan.</span></p>");
+            sb.AppendLine("<p><span>Mohon tolong balas kembali email ini untuk mengkonfirmasi jumlah dan tanggal pengiriman yang tertera pada PO dalam waktu 24 jam ke depan.</span></p>");
+            sb.AppendLine("<p><span>Harap perhatikan dan patuhi informasi pengemasan dan pengiriman berikut.</span></p>");
+            sb.AppendLine("<ol>");
+            sb.AppendLine("<li><span>Untuk menunjukkan nomor PO Syspex untuk Invoice dan DO.</span></li>");
+            sb.AppendLine("<li><span>Untuk menunjukkan nomor seri pada setiap kemasan luar (Bila ada).</span></li>");
+            sb.AppendLine("<li><span>Perhatikan jam penerimaan kami (Senin sampai Jumat 08:00 – 12:00 & 13:00 – 16:00). <strong>- Hanya berlaku untuk pengiriman di Gudang Syspex</strong></span></li>");
+            sb.AppendLine("<li><span>Harap perhatikan dan patuhi bahwa tinggi total barang palet yang masuk tidak boleh melebihi 2m.</span></li>");
+            sb.AppendLine("<li><span>Palet harus dapat diangkut dengan truk palet tangan.</span></li>");
+            sb.AppendLine("<li><span>Silakan kirim email kepada kami salinan faktur dan daftar pengepakan setelah pengiriman siap untuk dikirim.</span></li>");
+            sb.AppendLine("<li><span>Untuk pengiriman beberapa paket, harap cantumkan daftar konten di luar setiap paket.</span></li>");
+            sb.AppendLine("</ol>");
+            sb.AppendLine("<p><span>Terima kasih atas kerja sama anda.</span></p>");
+            sb.AppendLine("<p><span>Salam,</span></p>");
+            sb.AppendLine("<p><span>Tim Pengadaan Syspex</span></p>");
             return sb.ToString();
         }
 
