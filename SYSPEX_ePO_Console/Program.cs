@@ -31,14 +31,12 @@ namespace SYSPEX_ePO_Console
             //  Go Live 10 / 08 / 2021
 
             EPO("65ST"); // Go Live on 31/08/20
-            //System.Threading.Thread.Sleep(100);
+            System.Threading.Thread.Sleep(100);
             EPO("03SM"); // Go Live on 17/06/20
-            //System.Threading.Thread.Sleep(100);
+            System.Threading.Thread.Sleep(100);
             EPO("07ST"); // Go Live on 17/06/20
             System.Threading.Thread.Sleep(100);
-            EPO("04SI"); //Go Live on 22/06/20
-            System.Threading.Thread.Sleep(100);
-            System.Threading.Thread.Sleep(100);
+
             EPO("21SK"); //Go Live on 20240311
             System.Threading.Thread.Sleep(100);
             EPO("31SM"); //Go Live on 20240311
@@ -232,8 +230,11 @@ namespace SYSPEX_ePO_Console
                 if ((CompanyCode == "03SM") || (CompanyCode == "04SI"))
                     cryRpt.Load("F:\\Crystal Reports\\SYSPEX_PURCHASE_03SM&04SI.rpt");
 
-                if ((CompanyCode == "21SK") || (CompanyCode == "31SM"))
-                    cryRpt.Load("F:\\Crystal Reports\\SYSPEX_PURCHASE_21SK&31SM.rpt");
+                if ((CompanyCode == "21SK"))
+                    cryRpt.Load("F:\\Crystal Reports\\SYSPEX_PURCHASE_21SK.rpt");
+
+                if ((CompanyCode == "31SM"))
+                    cryRpt.Load("F:\\Crystal Reports\\SYSPEX_PURCHASE_31SM.rpt");
 
                 if (CompanyCode == "07ST")
                     cryRpt.Load("F:\\Crystal Reports\\SYSPEX_PURCHASE_07ST.rpt");
@@ -306,6 +307,8 @@ namespace SYSPEX_ePO_Console
 
                 mm.IsBodyHtml = true;
                 mm.Subject = VendorName + " " + ": " + "PO#" + DocNum;
+
+
                 if (CompanyCode == "65ST")
                     mm.Body = SG_HTMLBuilder(DocNum);
 
@@ -317,6 +320,12 @@ namespace SYSPEX_ePO_Console
 
                 if (CompanyCode == "07ST")
                     mm.Body = JB_HTMLBuilder(DocNum);
+
+                if (CompanyCode == "21SK")
+                    mm.Body = JK_HTMLBuilder(DocNum);
+
+                if (CompanyCode == "31SM")
+                    mm.Body = SB_HTMLBuilder(DocNum);
 
 
                 //  mm.To.Add("vigna@syspex.com");
@@ -343,7 +352,16 @@ namespace SYSPEX_ePO_Console
                     mm.Attachments.Add(new System.Net.Mail.Attachment(CrDiskFileDestinationOptions.DiskFileName));
                     smtp.Send(mm);
                 }
-                else
+                else if ((CompanyCode == "03SM") || (CompanyCode == "07ST"))
+                {
+                    System.Net.NetworkCredential NetworkCred = new System.Net.NetworkCredential("procurement@syspex.com", "pilot851");
+                    smtp.UseDefaultCredentials = true;
+                    smtp.Credentials = NetworkCred;
+                    smtp.Port = 587;
+                    mm.Attachments.Add(new System.Net.Mail.Attachment(CrDiskFileDestinationOptions.DiskFileName));
+                    smtp.Send(mm);
+                }
+                else if ((CompanyCode == "21SK") || (CompanyCode == "31SM"))
                 {
                     System.Net.NetworkCredential NetworkCred = new System.Net.NetworkCredential("noreply@syspex.com", "vani ktfs dhxq phcl");
                     smtp.UseDefaultCredentials = true;
@@ -352,7 +370,6 @@ namespace SYSPEX_ePO_Console
                     mm.Attachments.Add(new System.Net.Mail.Attachment(CrDiskFileDestinationOptions.DiskFileName));
                     smtp.Send(mm);
                 }
-
 
                 success = true;
 
@@ -408,7 +425,7 @@ namespace SYSPEX_ePO_Console
                 sb.AppendLine("select  Distinct top 5  T0.DocNum,CONVERT(VARCHAR(10), T0.docdate, 103) as docdate, T3.DocEntry,T0.CardCode, T0.CardName , T1.E_Mail, ");
                 sb.AppendLine("(CASE WHEN (select max( Country)  from CRD1 where ");
                 sb.AppendLine("CardCode = (select CardCode from OPOR where DocNum = T0.DocNum)   and AdresType ='B') != 'SG' ");
-                sb.AppendLine("THEN 'angela.yap@syspex.com,angie.koo@syspex.com' ELSE ''END) + ',' + T2.email + ',' +  ");
+                sb.AppendLine("THEN 'angela.yap@syspex.com,catherine.chang@syspex.com' ELSE ''END) + ',' + T2.email + ',' +  ");
                 sb.AppendLine("--- PR Requester if got multiple PR in one PO");
                 sb.AppendLine("ISNULL((SELECT STUFF ((SELECT ',' + Email from OHEM where CAST(empid as nvarchar) in ");
                 sb.AppendLine("(select Requester from OPRQ TX inner Join PRQ1 TY on Tx.DocEntry = Ty.DocEntry where Ty.TrgetEntry = T0.DocEntry ) FOR XML PATH('') ), 1, 1, '')),'') +");
@@ -429,14 +446,14 @@ namespace SYSPEX_ePO_Console
                 //Go Live 20-06-17
                 SQLConnection = KLConnection;
 
-                SQLQuery = "select  Distinct top 5  T0.DocNum,CONVERT(VARCHAR(10), T0.docdate, 103) as docdate, T3.DocEntry,T0.CardCode, T0.CardName , " +
+                SQLQuery = "select  Distinct top 8  T0.DocNum,CONVERT(VARCHAR(10), T0.docdate, 103) as docdate, T3.DocEntry,T0.CardCode, T0.CardName , " +
                     "T1.E_Mail,  T2.email + ',' + ISNULL((SELECT Email from OHEM where CAST(empid as nvarchar) = CAST(T4.Requester as nvarchar)),'') +',' + " +
-                    "ISNULL((SELECT Email from OHEM where empid = T4.OwnerCode ),'') + ',alice.foh@syspex.com,jane.khoo@syspex.com,procurement@syspex.com,vigna@syspex.com' +',' +" +
-                    " CASE WHEN T5.SlpName like  'TE01%'  THEN 'venice.tan@syspex.com,daphne.lee@syspex.com,peyyin.lim@syspex.com,vigna@syspex.com' ELSE '' END as [cc] " +
+                    "ISNULL((SELECT Email from OHEM where empid = T4.OwnerCode ),'') + ',jane.khoo@syspex.com,procurement@syspex.com,peyyin.lim@syspex.com,vigna@syspex.com' +',' +" +
+                    " CASE WHEN T5.SlpName like  'TE01%'  THEN 'daphne.lee@syspex.com,peyyin.lim@syspex.com,vigna@syspex.com' ELSE '' END as [cc] " +
                     " from OPOR T0 INNER JOIN OCRD T1 on T0.CardCode = T1.CardCode INNER JOIN OHEM T2 on T2.empID = T0.OwnerCode INNER JOIN POR1 " +
                     "T3 on T3.DocEntry = T0.DocEntry INNER JOIN OPRQ T4 on T4.DocEntry = T3.BaseEntry " +
                     "INNER JOIN OSLP T5 on T5.SlpCode = T0.SlpCode where year(t0.DocDate) = year(getdate()) and month(t0.DocDate) = month(getdate())" +
-                    " and T0.DocNum not in (select DocNum from[AndriodAppDB].[dbo].[syspex_ePO] where Company = '" + CompanyCode + "') and T0.DocDate >='20200617' and CAST(T0.U_equote AS nvarchar(max)) ='Yes' and T0.DocDate <= getdate() and T0.DocStatus = 'O'";
+                    " and T0.DocNum not in (select DocNum from[AndriodAppDB].[dbo].[syspex_ePO] where Company = '" + CompanyCode + "') and T0.DocDate >='20250101' and CAST(T0.U_equote AS nvarchar(max)) ='Yes' and T0.DocDate <= getdate() and T0.DocStatus = 'O'";
             }
 
             if (CompanyCode == "07ST")
@@ -444,10 +461,10 @@ namespace SYSPEX_ePO_Console
                 //Go Live 22-06-20
                 SQLConnection = JBConnection;
                 SQLQuery = "select  Distinct top 5  T0.DocNum,CONVERT(VARCHAR(10), T0.docdate, 103) as docdate, T3.DocEntry,T0.CardCode, T0.CardName , T1.E_Mail,  T2.email + ',' " +
-                    "+ ISNULL((SELECT Email from OHEM where CAST(empid as nvarchar) = CAST(T4.Requester as nvarchar)),'') +',' +'procurement@syspex.com,liyin.kee@syspex.com,' + ISNULL((SELECT Email from OHEM where empid = T4.OwnerCode ),'') + ',' + " +
-                    "CASE WHEN T5.SlpName like  'TE01%' THEN 'peyyin.lim@syspex.com,venice.tan@syspex.com,liyin.kee@syspex.com' ELSE '' END   as [cc]  from OPOR T0 INNER JOIN OCRD T1 on T0.CardCode = T1.CardCode INNER JOIN OHEM T2 on T2.empID = T0.OwnerCode INNER JOIN POR1 T3 on T3.DocEntry = T0.DocEntry" +
+                    "+ ISNULL((SELECT Email from OHEM where CAST(empid as nvarchar) = CAST(T4.Requester as nvarchar)),'') +',' +'procurement@syspex.com,peyyin.lim@syspex.com,' + ISNULL((SELECT Email from OHEM where empid = T4.OwnerCode ),'') + ',' + " +
+                    "CASE WHEN T5.SlpName like  'TE01%' THEN 'peyyin.lim@syspex.com,ivy.lim@syspex.com' ELSE '' END   as [cc]  from OPOR T0 INNER JOIN OCRD T1 on T0.CardCode = T1.CardCode INNER JOIN OHEM T2 on T2.empID = T0.OwnerCode INNER JOIN POR1 T3 on T3.DocEntry = T0.DocEntry" +
                     " INNER JOIN OPRQ T4 on T4.DocEntry = T3.BaseEntry INNER JOIN OSLP T5 on T5.SlpCode = T0.SlpCode where year(t0.DocDate) = year(getdate()) and month(t0.DocDate) = month(getdate())  and T0.DocNum not in (select DocNum from[AndriodAppDB].[dbo].[syspex_ePO] where Company = '" + CompanyCode + "') " +
-                    "and T0.DocDate >='20200622' and CAST(T0.U_equote AS nvarchar(max)) ='Yes' and  T0.DocDate <= getdate()  and T0.DocStatus = 'O'";
+                    "and T0.DocDate >='20250101' and CAST(T0.U_equote AS nvarchar(max)) ='Yes' and  T0.DocDate <= getdate()  and T0.DocStatus = 'O'";
             }
 
             if (CompanyCode == "21SK")
