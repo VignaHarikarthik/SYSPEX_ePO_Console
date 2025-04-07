@@ -354,7 +354,7 @@ namespace SYSPEX_ePO_Console
                 }
                 else if ((CompanyCode == "03SM") || (CompanyCode == "07ST"))
                 {
-                    System.Net.NetworkCredential NetworkCred = new System.Net.NetworkCredential("procurement@syspex.com", "pilot851");
+                    System.Net.NetworkCredential NetworkCred = new System.Net.NetworkCredential("procurement@syspex.com", "herself7");
                     smtp.UseDefaultCredentials = true;
                     smtp.Credentials = NetworkCred;
                     smtp.Port = 587;
@@ -422,22 +422,53 @@ namespace SYSPEX_ePO_Console
             {
                 SQLConnection = SGConnection;
                 StringBuilder sb = new StringBuilder();
-                sb.AppendLine("select  Distinct top 5  T0.DocNum,CONVERT(VARCHAR(10), T0.docdate, 103) as docdate, T3.DocEntry,T0.CardCode, T0.CardName , T1.E_Mail, ");
-                sb.AppendLine("(CASE WHEN (select max( Country)  from CRD1 where ");
-                sb.AppendLine("CardCode = (select CardCode from OPOR where DocNum = T0.DocNum)   and AdresType ='B') != 'SG' ");
-                sb.AppendLine("THEN 'angela.yap@syspex.com,catherine.chang@syspex.com' ELSE ''END) + ',' + T2.email + ',' +  ");
-                sb.AppendLine("--- PR Requester if got multiple PR in one PO");
-                sb.AppendLine("ISNULL((SELECT STUFF ((SELECT ',' + Email from OHEM where CAST(empid as nvarchar) in ");
-                sb.AppendLine("(select Requester from OPRQ TX inner Join PRQ1 TY on Tx.DocEntry = Ty.DocEntry where Ty.TrgetEntry = T0.DocEntry ) FOR XML PATH('') ), 1, 1, '')),'') +");
-                sb.AppendLine("',' +");
-                sb.AppendLine("--PR Owner Code if got multiple PR in one PO");
-                sb.AppendLine("ISNULL((SELECT STUFF ((SELECT ',' + Email from OHEM where CAST(empid as nvarchar) in ");
-                sb.AppendLine("(select TX.OwnerCode from OPRQ TX inner Join PRQ1 TY on Tx.DocEntry = Ty.DocEntry where Ty.TrgetEntry = T0.DocEntry ) FOR XML PATH('') ), 1, 1, '')),'') + ',' + 'procurement@syspex.com' +");
-                sb.AppendLine("',' + 'SG.Procurement@syspex.com' as [cc]");
-                sb.AppendLine("from OPOR T0 INNER JOIN OCRD T1 on T0.CardCode = T1.CardCode INNER JOIN OHEM T2 on T2.empID = T0.OwnerCode");
-                sb.AppendLine("INNER JOIN POR1 T3 on T3.DocEntry = T0.DocEntry  where  T0.DocNum  ");
-                sb.AppendLine("not in (select DocNum from[AndriodAppDB].[dbo].[syspex_ePO] where Company = '" + CompanyCode + "') and  CAST(T0.U_ePO AS nvarchar(max)) ='Yes' and T0.DocDate <= getdate() and T0.DocStatus = 'O'");
+
+                sb.AppendLine("SELECT DISTINCT TOP 5");
+                sb.AppendLine("    T0.DocNum,");
+                sb.AppendLine("    CONVERT(VARCHAR(10), T0.DocDate, 103) AS DocDate,");
+                sb.AppendLine("    T3.DocEntry,");
+                sb.AppendLine("    T0.CardCode,");
+                sb.AppendLine("    T0.CardName,");
+                sb.AppendLine("    T1.E_Mail,");
+                sb.AppendLine("    (CASE");
+                sb.AppendLine("        WHEN (SELECT MAX(Country) FROM CRD1");
+                sb.AppendLine("              WHERE CardCode = (SELECT CardCode FROM OPOR WHERE DocNum = T0.DocNum)");
+                sb.AppendLine("              AND AdresType = 'B') != 'SG'");
+                sb.AppendLine("        THEN 'angela.yap@syspex.com,catherine.chang@syspex.com'");
+                sb.AppendLine("        ELSE 'angela.yap@syspex.com'");
+                sb.AppendLine("     END) + ',' + T2.Email + ',' +");
+                sb.AppendLine("    -- PR Requester if multiple PRs exist in one PO");
+                sb.AppendLine("    ISNULL((SELECT STUFF((SELECT ',' + Email");
+                sb.AppendLine("                          FROM OHEM");
+                sb.AppendLine("                          WHERE CAST(empid AS NVARCHAR) IN");
+                sb.AppendLine("                              (SELECT Requester");
+                sb.AppendLine("                               FROM OPRQ TX");
+                sb.AppendLine("                               INNER JOIN PRQ1 TY ON TX.DocEntry = TY.DocEntry");
+                sb.AppendLine("                               WHERE TY.TrgetEntry = T0.DocEntry)");
+                sb.AppendLine("                          FOR XML PATH('')), 1, 1, '')), '') + ',' +");
+                sb.AppendLine("    -- PR Owner Code if multiple PRs exist in one PO");
+                sb.AppendLine("    ISNULL((SELECT STUFF((SELECT ',' + Email");
+                sb.AppendLine("                          FROM OHEM");
+                sb.AppendLine("                          WHERE CAST(empid AS NVARCHAR) IN");
+                sb.AppendLine("                              (SELECT TX.OwnerCode");
+                sb.AppendLine("                               FROM OPRQ TX");
+                sb.AppendLine("                               INNER JOIN PRQ1 TY ON TX.DocEntry = TY.DocEntry");
+                sb.AppendLine("                               WHERE TY.TrgetEntry = T0.DocEntry)");
+                sb.AppendLine("                          FOR XML PATH('')), 1, 1, '')), '') + ',' +");
+                sb.AppendLine("    'procurement@syspex.com' + ',' + 'SG.Procurement@syspex.com' AS [cc]");
+                sb.AppendLine("FROM OPOR T0");
+                sb.AppendLine("INNER JOIN OCRD T1 ON T0.CardCode = T1.CardCode");
+                sb.AppendLine("INNER JOIN OHEM T2 ON T2.empID = T0.OwnerCode");
+                sb.AppendLine("INNER JOIN POR1 T3 ON T3.DocEntry = T0.DocEntry");
+                sb.AppendLine("WHERE T0.DocNum NOT IN");
+                sb.AppendLine("    (SELECT DocNum FROM [AndriodAppDB].[dbo].[syspex_ePO]");
+                sb.AppendLine("     WHERE Company = '" + CompanyCode + "')");
+                sb.AppendLine("AND CAST(T0.U_ePO AS NVARCHAR(MAX)) = 'Yes'");
+                sb.AppendLine("AND T0.DocDate <= GETDATE()");
+                sb.AppendLine("AND T0.DocStatus = 'O'");
+
                 SQLQuery = sb.ToString();
+
                 //changes
             }
 
@@ -448,7 +479,7 @@ namespace SYSPEX_ePO_Console
 
                 SQLQuery = "select  Distinct top 8  T0.DocNum,CONVERT(VARCHAR(10), T0.docdate, 103) as docdate, T3.DocEntry,T0.CardCode, T0.CardName , " +
                     "T1.E_Mail,  T2.email + ',' + ISNULL((SELECT Email from OHEM where CAST(empid as nvarchar) = CAST(T4.Requester as nvarchar)),'') +',' + " +
-                    "ISNULL((SELECT Email from OHEM where empid = T4.OwnerCode ),'') + ',jane.khoo@syspex.com,procurement@syspex.com,peyyin.lim@syspex.com,vigna@syspex.com' +',' +" +
+                    "ISNULL((SELECT Email from OHEM where empid = T4.OwnerCode ),'') + ',jane.khoo@syspex.com,procurement@syspex.com,peyyin.lim@syspex.com,vigna@syspex.com,esther.lim@syspex.com' +',' +" +
                     " CASE WHEN T5.SlpName like  'TE01%'  THEN 'peyyin.lim@syspex.com,vigna@syspex.com' ELSE '' END as [cc] " +
                     " from OPOR T0 INNER JOIN OCRD T1 on T0.CardCode = T1.CardCode INNER JOIN OHEM T2 on T2.empID = T0.OwnerCode INNER JOIN POR1 " +
                     "T3 on T3.DocEntry = T0.DocEntry INNER JOIN OPRQ T4 on T4.DocEntry = T3.BaseEntry " +
