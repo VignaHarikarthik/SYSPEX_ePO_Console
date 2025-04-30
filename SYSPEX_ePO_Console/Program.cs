@@ -345,7 +345,7 @@ namespace SYSPEX_ePO_Console
                 };
                 if (CompanyCode == "65ST")
                 {
-                    System.Net.NetworkCredential NetworkCred = new System.Net.NetworkCredential("sg.procurement@syspex.com", "enhance5");
+                    System.Net.NetworkCredential NetworkCred = new System.Net.NetworkCredential("sg.procurement@syspex.com", "onzo yurc yoci zzzf"); //"enhance5");
                     smtp.UseDefaultCredentials = true;
                     smtp.Credentials = NetworkCred;
                     smtp.Port = 587;
@@ -354,7 +354,7 @@ namespace SYSPEX_ePO_Console
                 }
                 else if ((CompanyCode == "03SM") || (CompanyCode == "07ST"))
                 {
-                    System.Net.NetworkCredential NetworkCred = new System.Net.NetworkCredential("procurement@syspex.com", "herself7");
+                    System.Net.NetworkCredential NetworkCred = new System.Net.NetworkCredential("procurement@syspex.com", "wacj rcui wqrt wcpa"); //"herself7");
                     smtp.UseDefaultCredentials = true;
                     smtp.Credentials = NetworkCred;
                     smtp.Port = 587;
